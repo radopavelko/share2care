@@ -1,0 +1,228 @@
+// screens-borrows.jsx — My Loans (requests / borrowing / lent out) + Profile
+
+const { useState: useStateL } = React;
+
+function SectionLabel({ children, count }) {
+  const T = window.THEME;
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 4px 10px' }}>
+      <span style={{ fontFamily: 'DM Mono, monospace', fontSize: 12, letterSpacing: 0.5, textTransform: 'uppercase', color: T.inkSoft, whiteSpace: 'nowrap' }}>{children}</span>
+      {count != null && <span style={{ fontFamily: 'DM Mono, monospace', fontSize: 11.5, color: T.inkFaint }}>{count}</span>}
+    </div>
+  );
+}
+
+// ── MY LOANS ───────────────────────────────────────────────────
+function BorrowsScreen({ app }) {
+  const T = window.THEME;
+  const byId = id => app.items.find(it => it.id === id);
+
+  const incoming = app.requests.filter(r => r.dir === 'in' && r.status === 'pending');
+  const outgoing = app.requests.filter(r => r.from === 'u1' && r.status === 'pending');
+  const borrowing = app.items.filter(it => it.status === 'out' && it.borrower === 'u1');
+  const lentOut = app.items.filter(it => it.owner === 'u1' && it.status === 'out' && it.borrower !== 'u1');
+
+  const empty = !incoming.length && !outgoing.length && !borrowing.length && !lentOut.length;
+
+  return (
+    <div style={{ paddingBottom: 120 }}>
+      <div style={{ padding: '54px 20px 14px' }}>
+        <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 12, letterSpacing: 0.6, color: T.accent, textTransform: 'uppercase' }}>Across your groups</div>
+        <div style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 700, fontSize: 30, color: T.ink, letterSpacing: -0.5, marginTop: 3 }}>My loans</div>
+      </div>
+
+      <div style={{ padding: '0 20px' }}>
+        {/* INCOMING REQUESTS */}
+        {incoming.length > 0 && (
+          <div style={{ marginBottom: 26 }}>
+            <SectionLabel count={incoming.length}>Requests for you</SectionLabel>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {incoming.map(r => {
+                const it = byId(r.itemId); const from = window.MEMBERS[r.from];
+                return (
+                  <window.Card key={r.id} style={{ padding: 14 }}>
+                    <div style={{ display: 'flex', gap: 12 }}>
+                      <div style={{ width: 58, flexShrink: 0 }}><window.ItemThumb item={it} height={58} radius={12} /></div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 3 }}>
+                          <window.Avatar user={from} size={20} />
+                          <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, color: T.inkSoft }}><b style={{ color: T.ink }}>{from.name}</b> wants</span>
+                        </div>
+                        <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 15.5, color: T.ink }}>{it.name}</div>
+                        <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: T.inkSoft, marginTop: 2 }}>until {window.fmtDate(r.due)}{r.group ? ` · ${(app.groups.find(x => x.id === r.group) || {}).name || ''}` : ''}</div>
+                      </div>
+                    </div>
+                    {r.note && <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: T.inkSoft, fontStyle: 'italic', background: T.surfaceAlt, borderRadius: 12, padding: '9px 12px', margin: '11px 0 0', textWrap: 'pretty' }}>“{r.note}”</div>}
+                    <div style={{ display: 'flex', gap: 9, marginTop: 12 }}>
+                      <window.Btn variant="good" size="sm" full onClick={() => app.respondRequest(r.id, true)}><window.Icon name="check" size={17} /> Lend it</window.Btn>
+                      <window.Btn variant="danger" size="sm" full onClick={() => app.respondRequest(r.id, false)}>Not now</window.Btn>
+                    </div>
+                  </window.Card>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* BORROWING */}
+        <div style={{ marginBottom: 26 }}>
+          <SectionLabel count={borrowing.length + outgoing.length}>You’re borrowing</SectionLabel>
+          {borrowing.length + outgoing.length === 0 ? (
+            <EmptyHint text="Nothing borrowed right now. Browse the shelf to find something." />
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
+              {borrowing.map(it => {
+                const r = window.relativeDue(it.due);
+                const toneColor = r.tone === 'over' ? T.over : r.tone === 'soon' ? T.warn : T.inkSoft;
+                return (
+                  <window.Card key={it.id} style={{ padding: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{ width: 52, flexShrink: 0 }} onClick={() => app.openItem(it.id)}><window.ItemThumb item={it} height={52} radius={11} /></div>
+                      <div style={{ flex: 1, minWidth: 0 }} onClick={() => app.openItem(it.id)}>
+                        <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 15, color: T.ink }}>{it.name}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
+                          <window.Avatar user={it.owner} size={16} />
+                          <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkSoft }}>{window.MEMBERS[it.owner].name}</span>
+                          <span style={{ width: 3, height: 3, borderRadius: 9, background: T.inkFaint }} />
+                          <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, fontWeight: 600, color: toneColor }}>{r.label}</span>
+                        </div>
+                      </div>
+                      <window.Btn variant="ghost" size="sm" onClick={() => app.returnItem(it.id)}>Return</window.Btn>
+                    </div>
+                  </window.Card>
+                );
+              })}
+              {outgoing.map(r => {
+                const it = byId(r.itemId);
+                return (
+                  <window.Card key={r.id} style={{ padding: 12, opacity: 0.92 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{ width: 52, flexShrink: 0 }}><window.ItemThumb item={it} height={52} radius={11} /></div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 15, color: T.ink }}>{it.name}</div>
+                        <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.accentDeep, marginTop: 3, display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span className="pulse-dot" style={{ width: 7, height: 7, borderRadius: 9, background: T.accent, display: 'inline-block' }} />
+                          Waiting for {window.MEMBERS[it.owner].name}
+                        </div>
+                      </div>
+                      <span style={{ fontFamily: 'DM Mono, monospace', fontSize: 11.5, color: T.inkFaint }}>pending</span>
+                    </div>
+                  </window.Card>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* LENT OUT */}
+        <div style={{ marginBottom: 20 }}>
+          <SectionLabel count={lentOut.length}>Out with neighbors</SectionLabel>
+          {lentOut.length === 0 ? (
+            <EmptyHint text="None of your things are out right now." />
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
+              {lentOut.map(it => {
+                const r = window.relativeDue(it.due); const b = window.MEMBERS[it.borrower];
+                const toneColor = r.tone === 'over' ? T.over : r.tone === 'soon' ? T.warn : T.inkSoft;
+                return (
+                  <window.Card key={it.id} style={{ padding: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{ width: 52, flexShrink: 0 }}><window.ItemThumb item={it} height={52} radius={11} /></div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 15, color: T.ink }}>{it.name}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
+                          <window.Avatar user={b} size={16} />
+                          <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkSoft }}>with {b.name}</span>
+                          <span style={{ width: 3, height: 3, borderRadius: 9, background: T.inkFaint }} />
+                          <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, fontWeight: 600, color: toneColor }}>{r.label}</span>
+                        </div>
+                      </div>
+                      <window.Btn variant="soft" size="sm" onClick={() => app.markReturned(it.id)}>Got it back</window.Btn>
+                    </div>
+                  </window.Card>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {empty && <div style={{ height: 10 }} />}
+      </div>
+    </div>
+  );
+}
+
+function EmptyHint({ text }) {
+  const T = window.THEME;
+  return (
+    <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: T.inkFaint, padding: '14px 16px', background: T.surfaceAlt, borderRadius: 14, border: `1px dashed ${T.line}`, textWrap: 'pretty' }}>{text}</div>
+  );
+}
+
+// ── PROFILE ────────────────────────────────────────────────────
+function ProfileScreen({ app }) {
+  const T = window.THEME;
+  const me = window.MEMBERS.u1;
+  const myItems = app.items.filter(it => it.owner === 'u1');
+  const lentCount = myItems.filter(it => it.status === 'out').length;
+  const borrowingCount = app.items.filter(it => it.status === 'out' && it.borrower === 'u1').length;
+
+  const Stat = ({ n, label }) => (
+    <div style={{ flex: 1, textAlign: 'center' }}>
+      <div style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 700, fontSize: 24, color: T.ink }}>{n}</div>
+      <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkSoft, marginTop: 1 }}>{label}</div>
+    </div>
+  );
+
+  return (
+    <div style={{ paddingBottom: 120 }}>
+      <div style={{ padding: '60px 20px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+        <window.Avatar user={me} size={84} />
+        <div style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 700, fontSize: 25, color: T.ink, marginTop: 14, letterSpacing: -0.3 }}>{me.full}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: T.inkSoft, marginTop: 4 }}>
+          <window.Icon name="pin" size={14} color={T.inkFaint} /> {me.unit} · {app.groups.length} groups
+        </div>
+      </div>
+
+      <div style={{ padding: '20px 20px 0' }}>
+        <window.Card style={{ padding: '16px 8px', display: 'flex' }}>
+          <Stat n={myItems.length} label="On the shelf" />
+          <div style={{ width: 1, background: T.lineSoft }} />
+          <Stat n={lentCount} label="Lent out" />
+          <div style={{ width: 1, background: T.lineSoft }} />
+          <Stat n={borrowingCount} label="Borrowing" />
+        </window.Card>
+      </div>
+
+      <div style={{ padding: '24px 20px 0' }}>
+        <SectionLabel count={myItems.length}>On your shelf</SectionLabel>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {myItems.map(it => (
+            <window.Card key={it.id} onClick={() => app.openItem(it.id)} style={{ padding: 11 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 48, flexShrink: 0 }}><window.ItemThumb item={it} height={48} radius={10} /></div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 15, color: T.ink }}>{it.name}</div>
+                  <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkSoft, marginTop: 2 }}>{it.cat}</div>
+                </div>
+                <window.StatusBadge status={it.status} due={it.due} small />
+              </div>
+            </window.Card>
+          ))}
+        </div>
+        <button onClick={() => app.goTab('lend')} style={{
+          width: '100%', marginTop: 12, padding: '13px', borderRadius: 14, cursor: 'pointer',
+          border: `1.5px dashed ${T.line}`, background: 'transparent', color: T.accentDeep,
+          fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 14.5,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+        }}><window.Icon name="plus" size={18} /> Lend something new</button>
+
+        <div style={{ marginTop: 22, textAlign: 'center' }}>
+          <button onClick={app.reset} style={{ border: 'none', background: 'none', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: T.inkFaint, textDecoration: 'underline', textUnderlineOffset: 3 }}>Reset demo data</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { BorrowsScreen, ProfileScreen });

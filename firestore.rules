@@ -1,0 +1,40 @@
+rules_version = '2';
+// Share2 — single trusted circle. Any signed-in member can read everything and
+// take part in the borrow flow. Writes are scoped so people can only create
+// their own items/requests and edit their own profile.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Member profiles
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow write: if signedIn() && request.auth.uid == uid;
+    }
+
+    // Shared items
+    match /items/{itemId} {
+      allow read: if signedIn();
+      // you may only create items you own
+      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid;
+      // any member may update (needed for the borrow / return flow); only the
+      // owner may delete their item
+      allow update: if signedIn();
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
+    }
+
+    // Borrow requests
+    match /requests/{reqId} {
+      allow read: if signedIn();
+      // you may only create a request from yourself
+      allow create: if signedIn() && request.resource.data.fromUid == request.auth.uid;
+      // either party may update status (approve / decline)
+      allow update: if signedIn();
+      allow delete: if signedIn() &&
+        (resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid);
+    }
+  }
+}
