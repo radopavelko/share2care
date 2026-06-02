@@ -50,21 +50,13 @@ function Icon({ name, size = 22, color = 'currentColor', stroke = 2 }) {
 }
 
 // Avatar — shows the member's Google photo when available, else initials on a warm tint.
+// Resolves a string uid against the live MEMBERS map, or takes a user object directly,
+// so the same person renders identically everywhere (shelf, profile, cards).
 function Avatar({ user, size = 40, ring = false }) {
   const u = typeof user === 'string' ? window.MEMBERS[user] : user;
   if (!u) return null;
   const ringStyle = ring ? `0 0 0 2.5px ${THEME.surface}, 0 0 0 4px ${(u.color || THEME.accent)}33` : 'none';
-  if (u.photoURL) {
-    return (
-      <img src={u.photoURL} alt={u.name || ''} referrerPolicy="no-referrer"
-        onError={e => { e.currentTarget.style.display = 'none'; }}
-        style={{
-          width: size, height: size, borderRadius: '50%', flexShrink: 0, objectFit: 'cover',
-          boxShadow: ringStyle, userSelect: 'none',
-        }} />
-    );
-  }
-  return (
+  const initials = (
     <div style={{
       width: size, height: size, borderRadius: '50%', flexShrink: 0,
       background: u.color || THEME.accent, color: '#fff',
@@ -73,6 +65,24 @@ function Avatar({ user, size = 40, ring = false }) {
       fontSize: size * 0.4, letterSpacing: 0.2,
       boxShadow: ringStyle, userSelect: 'none',
     }}>{(u.name || '?')[0]}</div>
+  );
+  if (!u.photoURL) return initials;
+  // Keyed by the photo URL so each person's image is isolated (no stale/“swapped”
+  // pixels carried over when a slot re-renders for a different member), and so the
+  // failure state resets when the URL changes.
+  return <AvatarPhoto key={u.photoURL} src={u.photoURL} alt={u.name || ''} size={size} ringStyle={ringStyle} fallback={initials} />;
+}
+
+function AvatarPhoto({ src, alt, size, ringStyle, fallback }) {
+  const [failed, setFailed] = React.useState(false);
+  if (failed) return fallback;
+  return (
+    <img src={src} alt={alt} referrerPolicy="no-referrer"
+      onError={() => setFailed(true)}
+      style={{
+        width: size, height: size, borderRadius: '50%', flexShrink: 0, objectFit: 'cover',
+        boxShadow: ringStyle, userSelect: 'none', display: 'block',
+      }} />
   );
 }
 
