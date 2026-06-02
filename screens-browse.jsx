@@ -46,9 +46,9 @@ function BrowseScreen({ app }) {
   const cats = ['All', ...window.CATEGORIES];
   const gid = app.groupId;
   let list = app.items.filter(it => {
-    // group filter: when a group is selected, show items shared with it
-    // (items not assigned to any group stay visible everywhere as a fallback)
-    const okGroup = !gid || !it.groups || it.groups.length === 0 || it.groups.includes(gid);
+    // group filter: a selected group shows ONLY items explicitly shared with it.
+    // "All things" (no group selected) shows the whole circle's shelf.
+    const okGroup = !gid || (Array.isArray(it.groups) && it.groups.includes(gid));
     const okCat = cat === 'All' || it.cat === cat;
     const okQ = !q || (it.name + ' ' + it.cat + ' ' + ownerLabel(it.ownerUid, uid)).toLowerCase().includes(q.toLowerCase());
     return okGroup && okCat && okQ;
