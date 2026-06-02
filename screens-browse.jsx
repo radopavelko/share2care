@@ -38,7 +38,11 @@ function BrowseScreen({ app }) {
   const incoming = app.requests.filter(r => r.toUid === uid && r.status === 'pending');
 
   const memberIds = Object.keys(app.members);
-  const others = memberIds.filter(id => id !== uid);
+  // Members to show in the header avatar stack: everyone in the current group
+  // (or the whole circle when viewing "All things"), with you always first so
+  // your own icon — the same Google photo as the You tab — leads the row.
+  const circleIds = app.group ? (app.group.memberUids || []) : memberIds;
+  const stackIds = [uid, ...circleIds.filter(id => id !== uid)].filter(id => app.members[id]);
   const cats = ['All', ...window.CATEGORIES];
   const gid = app.groupId;
   let list = app.items.filter(it => {
@@ -63,7 +67,8 @@ function BrowseScreen({ app }) {
             <span style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 700, fontSize: 28, color: T.ink, letterSpacing: -0.5, lineHeight: 1.05 }}>{app.group ? app.group.name : 'The shelf'}</span>
             <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, color: T.inkSoft, marginTop: 3 }}>{memberIds.length} {memberIds.length === 1 ? 'member' : 'members'} · {list.length} {list.length === 1 ? 'thing' : 'things'}</div>
           </div>
-          {others.length > 0 && <AvatarStack ids={others} />}
+          {/* All members of the current group, you first (matches the You tab). */}
+          {stackIds.length > 0 && <AvatarStack ids={stackIds} size={36} max={5} />}
         </div>
       </div>
 
