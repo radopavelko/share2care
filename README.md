@@ -80,6 +80,22 @@ deploy fails. This app is a **static site**, so use **Pages** instead.
 > (its **Settings → Delete**) so it doesn't keep failing, then create the
 > Pages project as above. Every push to `main` now redeploys automatically.
 
+### Branch preview URLs (testing a branch)
+
+Pages builds **every branch**, not just `main`, so you can share a work-in-progress
+branch without touching production.
+
+- Settings → **Builds & deployments** → **Preview deployments** must be
+  **"All non-Production branches"** (the default).
+- After a branch is **pushed while the Pages project is connected**, Cloudflare
+  gives it a stable alias URL: `https://<branch>.<project>.pages.dev`
+  (e.g. `https://less-groups.share2care.pages.dev`). Find it under the
+  **Deployments** tab. Use the branch alias, not the per-commit hash URL.
+- A branch created *before* the Pages project was connected won't build until
+  its **next push** — push any commit to it to trigger the first preview build.
+- Add each preview domain you share to Firebase **Authorized domains** (Firebase
+  doesn't accept wildcards, so add the exact `<branch>.<project>.pages.dev`).
+
 ---
 
 ## Run locally
