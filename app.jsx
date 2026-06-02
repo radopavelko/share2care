@@ -161,14 +161,20 @@ function App({ me }) {
     // ── Groups ──────────────────────────────────────────────────
     switchGroup: (id) => { setCurrentGroup(id); setModal(null); setModalArg(null); },
 
-    createGroup: async (name) => {
+    createGroup: async (name, itemIds = []) => {
       const nm = (name || '').trim();
       if (!nm) return;
+      // only ever share items the signed-in user actually owns
+      const own = (itemIds || []).filter(id => {
+        const it = items.find(x => x.id === id);
+        return it && it.ownerUid === uid;
+      });
       try {
         const id = await window.S2.createGroup(nm, uid);
+        if (own.length) await Promise.all(own.map(itemId => window.S2.shareItemToGroup(itemId, id)));
         setCurrentGroup(id);
         setModal(null); setModalArg(null);
-        toast(`Created “${nm}”`, 'users');
+        toast(own.length ? `Created “${nm}” · ${own.length} item${own.length === 1 ? '' : 's'}` : `Created “${nm}”`, 'users');
       } catch (e) { console.error(e); toast('Could not create group', 'x'); }
     },
 

@@ -82,11 +82,39 @@ function GroupSwitcherSheet({ app }) {
   );
 }
 
+// A selectable row for one of the user's own items.
+function ItemPickRow({ app, item, on, onToggle }) {
+  const T = window.THEME;
+  return (
+    <button onClick={onToggle} style={{
+      display: 'flex', alignItems: 'center', gap: 11, width: '100%', textAlign: 'left',
+      padding: 8, borderRadius: 13, cursor: 'pointer',
+      border: `1.5px solid ${on ? T.accent : T.line}`, background: on ? T.accentSoft : T.surface,
+      WebkitTapHighlightColor: 'transparent',
+    }}>
+      <div style={{ width: 40, flexShrink: 0 }}><window.ItemThumb item={item} height={40} radius={9} /></div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 14.5, color: T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</div>
+        <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12, color: T.inkSoft }}>{item.cat}</div>
+      </div>
+      <div style={{
+        width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
+        border: `1.5px solid ${on ? T.accent : T.line}`, background: on ? T.accent : 'transparent',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>{on && <window.Icon name="check" size={14} color="#fff" />}</div>
+    </button>
+  );
+}
+
 // ── Create a group ─────────────────────────────────────────────
 function CreateGroupSheet({ app }) {
   const T = window.THEME;
   const [name, setName] = useStateGr('');
+  const [sel, setSel] = useStateGr([]);
   const ready = name.trim().length > 0;
+  const mine = app.items.filter(it => it.ownerUid === app.uid);
+  const toggle = (id) => setSel(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+
   return (
     <window.Sheet open title="Create a group" onClose={app.closeModal}>
       <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: T.inkSoft, marginBottom: 16, textWrap: 'pretty' }}>
@@ -95,7 +123,22 @@ function CreateGroupSheet({ app }) {
       <window.Field label="Group name">
         <input autoFocus value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Maple Street neighbours" style={window.inputStyle(T)} />
       </window.Field>
-      <window.Btn variant="primary" full size="lg" disabled={!ready} onClick={() => app.createGroup(name)}>
+
+      <window.Field label={mine.length ? `Add your items${sel.length ? ` · ${sel.length} selected` : ''}` : 'Add your items'}>
+        {mine.length === 0 ? (
+          <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, color: T.inkFaint, padding: '12px 14px', background: T.surfaceAlt, borderRadius: 13, border: `1px dashed ${T.line}` }}>
+            You haven’t added any items yet. Create the group, then add things from the Lend tab.
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {mine.map(it => (
+              <ItemPickRow key={it.id} app={app} item={it} on={sel.includes(it.id)} onToggle={() => toggle(it.id)} />
+            ))}
+          </div>
+        )}
+      </window.Field>
+
+      <window.Btn variant="primary" full size="lg" disabled={!ready} onClick={() => app.createGroup(name, sel)}>
         <window.Icon name="users" size={18} /> Create group
       </window.Btn>
     </window.Sheet>
@@ -187,6 +230,27 @@ function ManageGroupSheet({ app }) {
           ))}
         </div>
       )}
+
+      {/* Your items in this group */}
+      {(() => {
+        const mine = app.items.filter(it => it.ownerUid === app.uid);
+        if (!mine.length) return null;
+        const inCount = mine.filter(it => (it.groups || []).includes(g.id)).length;
+        return (
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 13.5, color: T.ink, marginBottom: 9 }}>
+              Your items in this group{inCount ? ` · ${inCount}` : ''}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {mine.map(it => (
+                <ItemPickRow key={it.id} app={app} item={it}
+                  on={(it.groups || []).includes(g.id)}
+                  onToggle={() => app.toggleItemGroup(it, g.id)} />
+              ))}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Members */}
       <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 13.5, color: T.ink, marginBottom: 10 }}>
