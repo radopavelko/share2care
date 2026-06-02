@@ -40,21 +40,28 @@ function BrowseScreen({ app }) {
   const memberIds = Object.keys(app.members);
   const others = memberIds.filter(id => id !== uid);
   const cats = ['All', ...window.CATEGORIES];
+  const gid = app.groupId;
   let list = app.items.filter(it => {
+    // group filter: when a group is selected, show items shared with it
+    // (items not assigned to any group stay visible everywhere as a fallback)
+    const okGroup = !gid || !it.groups || it.groups.length === 0 || it.groups.includes(gid);
     const okCat = cat === 'All' || it.cat === cat;
     const okQ = !q || (it.name + ' ' + it.cat + ' ' + ownerLabel(it.ownerUid, uid)).toLowerCase().includes(q.toLowerCase());
-    return okCat && okQ;
+    return okGroup && okCat && okQ;
   });
   const rank = { available: 0, pending: 1, out: 2 };
   list = list.slice().sort((a, b) => (rank[a.status] ?? 3) - (rank[b.status] ?? 3));
 
   return (
     <div style={{ paddingBottom: 120 }}>
-      <div style={{ padding: '52px 20px 6px' }}>
+      <div style={{ padding: '46px 20px 6px' }}>
+        <div style={{ marginBottom: 12 }}>
+          <window.GroupSwitcher app={app} />
+        </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <div style={{ minWidth: 0 }}>
-            <span style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 700, fontSize: 28, color: T.ink, letterSpacing: -0.5, lineHeight: 1.05 }}>The shelf</span>
-            <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, color: T.inkSoft, marginTop: 3 }}>{memberIds.length} {memberIds.length === 1 ? 'member' : 'members'} · {app.items.length} shared</div>
+            <span style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 700, fontSize: 28, color: T.ink, letterSpacing: -0.5, lineHeight: 1.05 }}>{app.group ? app.group.name : 'The shelf'}</span>
+            <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, color: T.inkSoft, marginTop: 3 }}>{memberIds.length} {memberIds.length === 1 ? 'member' : 'members'} · {list.length} {list.length === 1 ? 'thing' : 'things'}</div>
           </div>
           {others.length > 0 && <AvatarStack ids={others} />}
         </div>
@@ -173,6 +180,32 @@ function ItemDetail({ app, item }) {
                 <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: T.inkSoft, marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{owner.email}</div>
               )}
             </div>
+          </div>
+        )}
+
+        {isMine && app.groups.length > 0 && (
+          <div style={{ marginTop: 18 }}>
+            <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 13.5, color: T.ink, marginBottom: 9 }}>Shared with</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {app.groups.map(g => {
+                const on = (item.groups || []).includes(g.id);
+                return (
+                  <button key={g.id} onClick={() => app.toggleItemGroup(item, g.id)} style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 13px', borderRadius: 999,
+                    cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, fontWeight: 600,
+                    border: `1.5px solid ${on ? T.accent : T.line}`,
+                    background: on ? T.accent : T.surface, color: on ? '#fff' : T.inkSoft,
+                    transition: 'all .14s ease', WebkitTapHighlightColor: 'transparent',
+                  }}>
+                    <window.Icon name={on ? 'check' : 'plus'} size={15} color={on ? '#fff' : T.inkFaint} />
+                    {g.name}
+                  </button>
+                );
+              })}
+            </div>
+            {(!item.groups || item.groups.length === 0) && (
+              <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkFaint, marginTop: 8 }}>Not in a group yet — shown to everyone.</div>
+            )}
           </div>
         )}
 

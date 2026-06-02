@@ -40,6 +40,11 @@ function Icon({ name, size = 22, color = 'currentColor', stroke = 2 }) {
     heart:   <><path d="M12 20S4 14.5 4 9.2A4.2 4.2 0 0112 6a4.2 4.2 0 018 3.2C20 14.5 12 20 12 20z" {...p} /></>,
     box:     <><path d="M4 8l8-4 8 4-8 4-8-4zM4 8v8l8 4 8-4V8M12 12v8" {...p} /></>,
     logout:  <><path d="M15 12H4M11 6l-6 6 6 6" {...p} /><path d="M14 4h5v16h-5" {...p} /></>,
+    users:   <><circle cx="9" cy="8" r="3.4" {...p} /><path d="M3.5 19c1-3.2 3.4-4.2 5.5-4.2s4.5 1 5.5 4.2" {...p} /><path d="M16 5.2a3.2 3.2 0 010 5.8M17.5 14.6c1.8.5 3.2 1.7 4 4.4" {...p} /></>,
+    link:    <><path d="M9.5 13.5l5-5M8 11l-2 2a3.2 3.2 0 004.5 4.5l2-2M16 13l2-2A3.2 3.2 0 0013.5 6.5l-2 2" {...p} /></>,
+    mail:    <><rect x="3.5" y="5.5" width="17" height="13" rx="2.5" {...p} /><path d="M4 7l8 5.5L20 7" {...p} /></>,
+    copy:    <><rect x="9" y="9" width="11" height="11" rx="2.5" {...p} /><path d="M5 15H4.5A1.5 1.5 0 013 13.5v-9A1.5 1.5 0 014.5 3h9A1.5 1.5 0 0115 4.5V5" {...p} /></>,
+    trash:   <><path d="M5 7h14M9 7V5h6v2M7 7l1 12h8l1-12" {...p} /></>,
   };
   return <svg width={size} height={size} viewBox="0 0 24 24" style={{ display: 'block' }}>{paths[name]}</svg>;
 }

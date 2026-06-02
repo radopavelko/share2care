@@ -26,6 +26,16 @@ service cloud.firestore {
       allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
     }
 
+    // Groups (organizing layer). Open read for signed-in members of the circle;
+    // you can only create a group you own. Updates are allowed for any signed-in
+    // user so people can join (arrayUnion) and owners can invite by email.
+    match /groups/{groupId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid;
+      allow update: if signedIn();
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
+    }
+
     // Borrow requests
     match /requests/{reqId} {
       allow read: if signedIn();

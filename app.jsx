@@ -61,12 +61,18 @@ function App({ me }) {
   const [members, setMembers] = useState(window.MEMBERS);
   const [items, setItems] = useState([]);
   const [requests, setRequests] = useState([]);
+  const [groups, setGroups] = useState([]);
+  const [groupId, setGroupId] = useState(() => {
+    try { return localStorage.getItem('s2.group.' + me.id) || null; } catch (e) { return null; }
+  });
   const [tab, setTab] = useState('browse');
   const [detailId, setDetailId] = useState(null);
   const [modal, setModal] = useState(null);
+  const [modalArg, setModalArg] = useState(null);
   const [toastData, setToastData] = useState(null);
   const toastTimer = useRef(null);
   const scrollRef = useRef(null);
+  const claimedRef = useRef(false);
 
   window.MEMBERS = members;
   const uid = me.id;
@@ -76,8 +82,63 @@ function App({ me }) {
     const u1 = window.S2.subUsers(setMembers);
     const u2 = window.S2.subItems(setItems);
     const u3 = window.S2.subRequests(setRequests);
-    return () => { u1(); u2(); u3(); };
+    const u4 = window.S2.subGroups(setGroups);
+    return () => { u1(); u2(); u3(); u4(); };
   }, []);
+
+  // Groups I belong to, plus the currently selected one (null = all things).
+  const myGroups = groups.filter(g => Array.isArray(g.memberUids) && g.memberUids.includes(uid));
+  const group = groupId ? myGroups.find(g => g.id === groupId) || null : null;
+
+  // If the saved group is one I'm no longer in (or never loaded), fall back to "all".
+  useEffect(() => {
+    if (groupId && groups.length && !group) setCurrentGroup(null);
+  }, [groupId, groups.length, group]);
+
+  const setCurrentGroup = (id) => {
+    setGroupId(id);
+    try {
+      if (id) localStorage.setItem('s2.group.' + uid, id);
+      else localStorage.removeItem('s2.group.' + uid);
+    } catch (e) { /* ignore */ }
+  };
+
+  // Auto-claim: turn any pending email invites for me into real membership,
+  // and honour a ?join=CODE invite link, once groups have loaded.
+  useEffect(() => {
+    if (claimedRef.current || !groups.length) return;
+    const myEmail = (me.email || '').trim().toLowerCase();
+    let joinedId = null;
+
+    // email invites addressed to me
+    if (myEmail) {
+      groups.forEach(g => {
+        const invited = (g.invitedEmails || []).map(e => e.toLowerCase());
+        const isMember = (g.memberUids || []).includes(uid);
+        if (invited.includes(myEmail) && !isMember) {
+          window.S2.claimEmailInvite(g.id, uid, myEmail).catch(console.error);
+          joinedId = joinedId || g.id;
+        }
+      });
+    }
+
+    // ?join=CODE link
+    try {
+      const code = new URLSearchParams(window.location.search).get('join');
+      if (code) {
+        const g = groups.find(x => (x.code || '').toUpperCase() === code.trim().toUpperCase());
+        if (g) {
+          if (!(g.memberUids || []).includes(uid)) window.S2.joinGroupById(g.id, uid).catch(console.error);
+          joinedId = g.id;
+        }
+        const url = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, '', url);
+      }
+    } catch (e) { /* ignore */ }
+
+    claimedRef.current = true;
+    if (joinedId) setCurrentGroup(joinedId);
+  }, [groups]);
 
   useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = 0; }, [tab]);
 
@@ -88,21 +149,72 @@ function App({ me }) {
   };
 
   const app = useMemo(() => ({
-    me, uid, items, requests, members, modal,
+    me, uid, items, requests, members, modal, modalArg, toast,
+    groups: myGroups, group, groupId, allGroups: groups,
 
-    goTab: (x) => { setDetailId(null); setModal(null); setTab(x); },
+    goTab: (x) => { setDetailId(null); setModal(null); setModalArg(null); setTab(x); },
     openItem: (id) => setDetailId(id),
     closeItem: () => setDetailId(null),
-    openModal: (m) => setModal(m),
-    closeModal: () => setModal(null),
+    openModal: (m, arg = null) => { setModal(m); setModalArg(arg); },
+    closeModal: () => { setModal(null); setModalArg(null); },
 
-    addItem: async ({ name, cat, cond, desc, file }) => {
-      setModal(null);
+    // ── Groups ──────────────────────────────────────────────────
+    switchGroup: (id) => { setCurrentGroup(id); setModal(null); setModalArg(null); },
+
+    createGroup: async (name) => {
+      const nm = (name || '').trim();
+      if (!nm) return;
+      try {
+        const id = await window.S2.createGroup(nm, uid);
+        setCurrentGroup(id);
+        setModal(null); setModalArg(null);
+        toast(`Created “${nm}”`, 'users');
+      } catch (e) { console.error(e); toast('Could not create group', 'x'); }
+    },
+
+    joinByCode: async (code) => {
+      const c = (code || '').trim().toUpperCase();
+      if (!c) return;
+      const g = groups.find(x => (x.code || '').toUpperCase() === c);
+      if (!g) { toast('No group with that code', 'x'); return; }
+      try {
+        if (!(g.memberUids || []).includes(uid)) await window.S2.joinGroupById(g.id, uid);
+        setCurrentGroup(g.id);
+        setModal(null); setModalArg(null);
+        toast(`Joined “${g.name}”`, 'check');
+      } catch (e) { console.error(e); toast('Could not join group', 'x'); }
+    },
+
+    inviteEmail: async (groupGId, email) => {
+      const em = (email || '').trim().toLowerCase();
+      if (!em || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { toast('Enter a valid email', 'x'); return false; }
+      try { await window.S2.addEmailInvite(groupGId, em); toast(`Invited ${em}`, 'mail'); return true; }
+      catch (e) { console.error(e); toast('Could not add invite', 'x'); return false; }
+    },
+
+    removeInvite: async (groupGId, email) => {
+      try { await window.S2.removeEmailInvite(groupGId, email); }
+      catch (e) { console.error(e); toast('Could not remove invite', 'x'); }
+    },
+
+    toggleItemGroup: async (item, gid) => {
+      const has = (item.groups || []).includes(gid);
+      try {
+        if (has) await window.S2.unshareItemFromGroup(item.id, gid);
+        else await window.S2.shareItemToGroup(item.id, gid);
+      } catch (e) { console.error(e); toast('Could not update sharing', 'x'); }
+    },
+
+    inviteLink: (g) => `${window.location.origin}${window.location.pathname}?join=${g.code}`,
+
+    addItem: async ({ name, cat, cond, desc, file, groups: gids }) => {
+      setModal(null); setModalArg(null);
       try {
         let photoURL = '';
         if (file) { toast('Uploading photo…', 'camera'); photoURL = await window.S2.uploadPhoto(file, uid); }
+        const shareGroups = gids && gids.length ? gids : (groupId ? [groupId] : []);
         await window.S2.addItem({
-          name, cat, cond, desc, photoURL,
+          name, cat, cond, desc, photoURL, groups: shareGroups,
           ownerUid: uid, status: 'available', borrowerUid: null, due: null,
         });
         toast('Added to your shelf', 'box');
@@ -157,7 +269,7 @@ function App({ me }) {
     notifyWhenFree: (it) => toast(`We’ll let you know when ${it.name} is free`, 'bell'),
 
     signOut: () => window.S2.signOut(),
-  }), [items, requests, members, modal, me, uid]);
+  }), [items, requests, members, modal, modalArg, groups, groupId, me, uid]);
 
   const incomingCount = requests.filter(r => r.toUid === uid && r.status === 'pending').length;
   const detailItem = detailId ? items.find(i => i.id === detailId) : null;
@@ -222,6 +334,7 @@ function App({ me }) {
 
       <window.Toast toast={toastData} />
       <window.NewItemSheet app={app} />
+      <window.GroupSheets app={app} />
     </div>
   );
 }

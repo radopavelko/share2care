@@ -13,6 +13,7 @@ import {
 import {
   getFirestore, collection, doc, getDoc, setDoc, addDoc, updateDoc,
   onSnapshot, query, orderBy, serverTimestamp, runTransaction,
+  arrayUnion, arrayRemove,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
   getStorage, ref as storageRef, uploadBytes, getDownloadURL,
@@ -62,6 +63,14 @@ async function ensureUserDoc(user) {
     await setDoc(uref, base, { merge: true });
   }
   return { id: user.uid, you: true, ...base };
+}
+
+// Short, human-friendly join code (no ambiguous chars like O/0, I/1).
+function makeCode(n = 6) {
+  const alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  let s = "";
+  for (let i = 0; i < n; i++) s += alphabet[Math.floor(Math.random() * alphabet.length)];
+  return s;
 }
 
 // Downscale an image file in the browser before upload (max edge 1280px, JPEG).
@@ -121,6 +130,36 @@ window.S2 = {
     },
     (err) => console.error("subUsers", err)
   ),
+  subGroups: (cb) => onSnapshot(
+    collection(db, "groups"),
+    (snap) => cb(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
+    (err) => console.error("subGroups", err)
+  ),
+
+  // ── Groups ──────────────────────────────────────────────────
+  createGroup: async (name, uid) => {
+    const ref = await addDoc(collection(db, "groups"), {
+      name, code: makeCode(), ownerUid: uid,
+      memberUids: [uid], invitedEmails: [], createdAt: serverTimestamp(),
+    });
+    return ref.id;
+  },
+  // Join by code, using a client-side list of groups (open read in this MVP).
+  joinGroupById: (groupId, uid) =>
+    updateDoc(doc(db, "groups", groupId), { memberUids: arrayUnion(uid) }),
+  addEmailInvite: (groupId, email) =>
+    updateDoc(doc(db, "groups", groupId), { invitedEmails: arrayUnion(email.trim().toLowerCase()) }),
+  removeEmailInvite: (groupId, email) =>
+    updateDoc(doc(db, "groups", groupId), { invitedEmails: arrayRemove(email.trim().toLowerCase()) }),
+  // When a user signs in, turn any email invites for them into real membership.
+  claimEmailInvite: (groupId, uid, email) =>
+    updateDoc(doc(db, "groups", groupId), {
+      memberUids: arrayUnion(uid), invitedEmails: arrayRemove(email.trim().toLowerCase()),
+    }),
+  shareItemToGroup: (itemId, groupId) =>
+    updateDoc(doc(db, "items", itemId), { groups: arrayUnion(groupId) }),
+  unshareItemFromGroup: (itemId, groupId) =>
+    updateDoc(doc(db, "items", itemId), { groups: arrayRemove(groupId) }),
 
   // writes
   addItem: (data) => addDoc(collection(db, "items"), {

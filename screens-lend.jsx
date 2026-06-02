@@ -2,6 +2,14 @@
 
 const { useState: useStateG, useRef: useRefG } = React;
 
+// Short, readable list of the group names an item is shared with.
+function groupNames(app, ids) {
+  if (!ids || !ids.length) return '';
+  const names = ids.map(id => { const g = app.groups.find(x => x.id === id); return g ? g.name : null; }).filter(Boolean);
+  if (!names.length) return '';
+  return names.length <= 2 ? names.join(', ') : `${names[0]} +${names.length - 1}`;
+}
+
 // ── LEND — your shelf (everything you add is visible to your circle) ──
 function LendScreen({ app }) {
   const T = window.THEME;
@@ -33,7 +41,9 @@ function LendScreen({ app }) {
                     <div style={{ width: 50, flexShrink: 0 }}><window.ItemThumb item={it} height={50} radius={11} /></div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 15, color: T.ink }}>{it.name}</div>
-                      <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkSoft, marginTop: 1 }}>{it.cat}</div>
+                      <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkSoft, marginTop: 1 }}>
+                        {it.cat}{groupNames(app, it.groups) ? ' · ' + groupNames(app, it.groups) : ''}
+                      </div>
                     </div>
                     <window.StatusBadge status={it.status} due={it.due} small />
                   </div>
@@ -57,6 +67,7 @@ function NewItemSheet({ app }) {
   const [file, setFile] = useStateG(null);
   const [preview, setPreview] = useStateG('');
   const [busy, setBusy] = useStateG(false);
+  const [gsel, setGsel] = useStateG(() => (app.groupId ? [app.groupId] : []));
   const fileRef = useRefG(null);
   const conds = ['Like new', 'Good', 'Well-loved'];
   const ready = name.trim() && cat && !busy;
@@ -64,10 +75,13 @@ function NewItemSheet({ app }) {
 
   const reset = () => {
     setName(''); setCat(''); setCond('Good'); setDesc(''); setBusy(false);
+    setGsel(app.groupId ? [app.groupId] : []);
     if (preview) URL.revokeObjectURL(preview);
     setFile(null); setPreview('');
     if (fileRef.current) fileRef.current.value = '';
   };
+
+  const toggleG = (id) => setGsel(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
 
   const pick = (e) => {
     const f = e.target.files && e.target.files[0];
@@ -79,7 +93,7 @@ function NewItemSheet({ app }) {
 
   const submit = async () => {
     setBusy(true);
-    await app.addItem({ name: name.trim(), cat, cond, desc: desc.trim() || 'Ask me anything about it!', file });
+    await app.addItem({ name: name.trim(), cat, cond, desc: desc.trim() || 'Ask me anything about it!', file, groups: gsel });
     reset();
   };
 
@@ -135,6 +149,29 @@ function NewItemSheet({ app }) {
       <window.Field label="Anything to know? (optional)">
         <textarea value={desc} onChange={e => setDesc(e.target.value)} rows={2} placeholder="Accessories, quirks, pickup notes…" style={{ ...window.inputStyle(T), resize: 'none' }} />
       </window.Field>
+
+      {app.groups.length > 0 && (
+        <window.Field label="Share with (optional)">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {app.groups.map(g => {
+              const on = gsel.includes(g.id);
+              return (
+                <button key={g.id} onClick={() => toggleG(g.id)} style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 13px', borderRadius: 999, cursor: 'pointer',
+                  fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, fontWeight: 600,
+                  border: `1.5px solid ${on ? T.accent : T.line}`,
+                  background: on ? T.accent : T.surface, color: on ? '#fff' : T.inkSoft, transition: 'all .14s ease',
+                }}>
+                  <window.Icon name="users" size={14} color={on ? '#fff' : T.inkFaint} /> {g.name}
+                </button>
+              );
+            })}
+          </div>
+          <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkFaint, marginTop: 8 }}>
+            {gsel.length ? 'Visible to those groups.' : 'Not in a group — shown to everyone.'}
+          </div>
+        </window.Field>
+      )}
 
       <window.Btn variant="primary" full size="lg" disabled={!ready} onClick={submit}>
         <window.Icon name="plus" size={19} /> {busy ? 'Adding…' : 'Put on your shelf'}
