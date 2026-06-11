@@ -49,7 +49,7 @@ function SignIn({ onSignIn, error }) {
       )}
 
       <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkFaint, marginTop: 26, maxWidth: 280, lineHeight: 1.5 }}>
-        Everyone who signs in shares one circle — they can see and borrow each other's things.
+        Create or join groups with people you trust — you only see each other's shared things.
       </div>
     </div>
   );

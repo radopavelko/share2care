@@ -77,18 +77,23 @@ function BrowseScreen({ app }) {
   const [cat, setCat] = useStateB('All');
   const incoming = app.requests.filter(r => r.toUid === uid && r.status === 'pending');
 
-  const memberIds = Object.keys(app.members);
-  // Members to show in the header avatar stack: everyone in the current group
-  // (or the whole circle when viewing "All things"), with you always first so
-  // your own icon — the same Google photo as the You tab — leads the row.
-  const circleIds = app.group ? (app.group.memberUids || []) : memberIds;
+  // Members to show in the header avatar stack: the current group's members, or
+  // on "All things" everyone across the groups you belong to — with you always
+  // first so your own icon (same Google photo as the You tab) leads the row.
+  const circleIds = app.group
+    ? (app.group.memberUids || [])
+    : [...new Set(app.groups.flatMap(g => g.memberUids || []))];
   const stackIds = [uid, ...circleIds.filter(id => id !== uid)].filter(id => app.members[id]);
   const cats = ['All', ...window.CATEGORIES];
   const gid = app.groupId;
+  const myGroupIds = app.groups.map(g => g.id);
   let list = app.items.filter(it => {
-    // group filter: a selected group shows ONLY items explicitly shared with it.
-    // "All things" (no group selected) shows the whole circle's shelf.
-    const okGroup = !gid || (Array.isArray(it.groups) && it.groups.includes(gid));
+    // A selected group shows ONLY items explicitly shared with it. "All things"
+    // shows your own items plus items shared into any group you belong to —
+    // never items from people outside your groups.
+    const okGroup = gid
+      ? (Array.isArray(it.groups) && it.groups.includes(gid))
+      : (it.ownerUid === uid || (Array.isArray(it.groups) && it.groups.some(g => myGroupIds.includes(g))));
     const okCat = cat === 'All' || window.normCat(it.cat) === cat;
     const okQ = !q || (it.name + ' ' + window.normCat(it.cat) + ' ' + ownerLabel(it.ownerUid, uid)).toLowerCase().includes(q.toLowerCase());
     return okGroup && okCat && okQ;
@@ -105,7 +110,7 @@ function BrowseScreen({ app }) {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <div style={{ minWidth: 0 }}>
             <span style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 700, fontSize: 28, color: T.ink, letterSpacing: -0.5, lineHeight: 1.05 }}>{app.group ? app.group.name : 'The shelf'}</span>
-            <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, color: T.inkSoft, marginTop: 3 }}>{memberIds.length} {memberIds.length === 1 ? 'member' : 'members'} · {list.length} {list.length === 1 ? 'thing' : 'things'}</div>
+            <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, color: T.inkSoft, marginTop: 3 }}>{stackIds.length} {stackIds.length === 1 ? 'member' : 'members'} · {list.length} {list.length === 1 ? 'thing' : 'things'}</div>
           </div>
           {/* All members of the current group, you first (matches the You tab). */}
           {stackIds.length > 0 && <AvatarStack ids={stackIds} size={36} max={5} />}
@@ -259,7 +264,7 @@ function ItemDetail({ app, item }) {
               })}
             </div>
             {(!item.groups || item.groups.length === 0) && (
-              <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkFaint, marginTop: 8 }}>Not in a group yet — shown to everyone.</div>
+              <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkFaint, marginTop: 8 }}>Not in a group yet — only you can see it.</div>
             )}
           </div>
         )}

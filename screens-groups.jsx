@@ -28,7 +28,7 @@ function GroupSwitcher({ app }) {
 // ── Switcher sheet: pick a group, or create / join ─────────────
 function GroupSwitcherSheet({ app }) {
   const T = window.THEME;
-  const rows = [{ id: null, name: 'All things', sub: 'Everything on the shelf' }]
+  const rows = [{ id: null, name: 'All things', sub: 'Your items + all your groups' }]
     .concat(app.groups.map(g => ({
       id: g.id, name: g.name, g,
       sub: `${(g.memberUids || []).length} ${(g.memberUids || []).length === 1 ? 'member' : 'members'}`,

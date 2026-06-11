@@ -114,8 +114,10 @@ Google sign-in works on `localhost` out of the box.
 
 ## Notes & possible next steps
 
-- **Open circle:** anyone who signs in with Google joins the single shared
-  circle. Good for a trusted-friends MVP. To lock it down later, add an
-  invite-code gate or an allow-list of emails.
+- **Group-scoped shelf:** the app only shows you your own items plus items
+  shared into groups you belong to ("All things" is the union of your groups).
+  Note this is enforced in the UI, not in the security rules — any signed-in
+  user can still technically read all data. Before opening the app to
+  strangers, tighten `firestore.rules` with per-group membership checks.
 - **Multiple groups, reminders/notifications, ratings** — all natural follow-ups
   the data model can grow into.

@@ -21,7 +21,7 @@ function LendScreen({ app }) {
       <div style={{ padding: '54px 20px 4px' }}>
         <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 12, letterSpacing: 0.6, color: T.accent, textTransform: 'uppercase' }}>Lend to your circle</div>
         <div style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 700, fontSize: 30, color: T.ink, letterSpacing: -0.5, marginTop: 3 }}>Your things</div>
-        <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14.5, color: T.inkSoft, marginTop: 6, textWrap: 'pretty' }}>Add things you own. Everyone in your circle can see and ask to borrow them.</div>
+        <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14.5, color: T.inkSoft, marginTop: 6, textWrap: 'pretty' }}>Add things you own, then share them with your groups so people can ask to borrow them.</div>
       </div>
 
       <div style={{ padding: '16px 20px 0' }}>
@@ -153,7 +153,7 @@ function NewItemSheet({ app }) {
             })}
           </div>
           <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkFaint, marginTop: 8 }}>
-            {gsel.length ? 'Visible to those groups.' : 'Not in a group — shown to everyone.'}
+            {gsel.length ? 'Visible to those groups.' : 'Not in a group — only you will see it.'}
           </div>
         </window.Field>
       )}
