@@ -29,6 +29,46 @@ function AvatarStack({ ids, size = 30, max = 4 }) {
   );
 }
 
+// First-run guidance shown when the shelf is empty: three clear steps and the
+// two actions that matter (add a thing, create a group).
+function GetStartedCard({ app }) {
+  const T = window.THEME;
+  const steps = [
+    { icon: 'box', title: 'Add something you own', sub: 'A drill, a tent, a board game — anything worth sharing.' },
+    { icon: 'users', title: 'Create a group', sub: 'Then invite people with a link or their email.' },
+    { icon: 'swap', title: 'Borrow each other’s things', sub: 'Ask, lend, and return — all in one place.' },
+  ];
+  return (
+    <div style={{ padding: '14px 20px 0' }}>
+      <window.Card style={{ padding: '22px 20px' }}>
+        <div style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 700, fontSize: 21, color: T.ink, letterSpacing: -0.3 }}>Get started</div>
+        <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: T.inkSoft, marginTop: 4, marginBottom: 18 }}>Three steps and you’re sharing.</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 15, marginBottom: 20 }}>
+          {steps.map((s, i) => (
+            <div key={i} style={{ display: 'flex', gap: 13, alignItems: 'flex-start' }}>
+              <div style={{
+                width: 34, height: 34, borderRadius: 11, flexShrink: 0, background: T.accentSoft,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}><window.Icon name={s.icon} size={18} color={T.accentDeep} /></div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 14.5, color: T.ink }}>{s.title}</div>
+                <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: T.inkSoft, marginTop: 1, lineHeight: 1.45, textWrap: 'pretty' }}>{s.sub}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <window.Btn variant="primary" full onClick={() => app.openModal('newItem')}>
+          <window.Icon name="plus" size={18} /> Add your first thing
+        </window.Btn>
+        <div style={{ height: 9 }} />
+        <window.Btn variant="ghost" full onClick={() => app.openModal('createGroup')}>
+          <window.Icon name="users" size={18} /> Create a group
+        </window.Btn>
+      </window.Card>
+    </div>
+  );
+}
+
 // ── BROWSE / SHELF ─────────────────────────────────────────────
 function BrowseScreen({ app }) {
   const T = window.THEME;
@@ -49,8 +89,8 @@ function BrowseScreen({ app }) {
     // group filter: a selected group shows ONLY items explicitly shared with it.
     // "All things" (no group selected) shows the whole circle's shelf.
     const okGroup = !gid || (Array.isArray(it.groups) && it.groups.includes(gid));
-    const okCat = cat === 'All' || it.cat === cat;
-    const okQ = !q || (it.name + ' ' + it.cat + ' ' + ownerLabel(it.ownerUid, uid)).toLowerCase().includes(q.toLowerCase());
+    const okCat = cat === 'All' || window.normCat(it.cat) === cat;
+    const okQ = !q || (it.name + ' ' + window.normCat(it.cat) + ' ' + ownerLabel(it.ownerUid, uid)).toLowerCase().includes(q.toLowerCase());
     return okGroup && okCat && okQ;
   });
   const rank = { available: 0, pending: 1, out: 2 };
@@ -132,10 +172,20 @@ function BrowseScreen({ app }) {
         ))}
       </div>
       {list.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '46px 30px', color: T.inkFaint, fontFamily: 'DM Sans, sans-serif' }}>
-          <div style={{ fontSize: 15, marginBottom: 14 }}>{q ? `Nothing matches “${q}”.` : 'Nothing on the shelf yet.'}</div>
-          {!q && <window.Btn variant="soft" size="sm" onClick={() => app.goTab('lend')}><window.Icon name="plus" size={16} /> Add your things</window.Btn>}
-        </div>
+        q ? (
+          <div style={{ textAlign: 'center', padding: '46px 30px', color: T.inkFaint, fontFamily: 'DM Sans, sans-serif', fontSize: 15 }}>
+            Nothing matches “{q}”.
+          </div>
+        ) : app.group ? (
+          <div style={{ textAlign: 'center', padding: '42px 30px', fontFamily: 'DM Sans, sans-serif' }}>
+            <div style={{ fontSize: 15, color: T.inkFaint, marginBottom: 14, textWrap: 'pretty' }}>Nothing in {app.group.name} yet.</div>
+            <window.Btn variant="soft" size="sm" onClick={() => app.openModal('manageGroup', app.group.id)}>
+              <window.Icon name="plus" size={16} /> Add your items
+            </window.Btn>
+          </div>
+        ) : (
+          <GetStartedCard app={app} />
+        )
       )}
     </div>
   );
@@ -168,7 +218,7 @@ function ItemDetail({ app, item }) {
       <div style={{ padding: '18px 20px 140px' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
           <div>
-            <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 11.5, letterSpacing: 0.4, color: T.inkFaint, textTransform: 'lowercase' }}>{item.cat} · {item.cond}</div>
+            <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 11.5, letterSpacing: 0.4, color: T.inkFaint, textTransform: 'lowercase' }}>{window.normCat(item.cat)}{item.cond && item.cond !== 'Good' ? ` · ${item.cond}` : ''}</div>
             <h1 style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 700, fontSize: 27, color: T.ink, letterSpacing: -0.5, margin: '5px 0 0', lineHeight: 1.1 }}>{item.name}</h1>
           </div>
           <div style={{ marginTop: 4 }}><window.StatusBadge status={item.status} due={item.due} /></div>
@@ -273,7 +323,7 @@ function BorrowSheet({ app, item, open, onClose }) {
         <div style={{ width: 56 }}><window.ItemThumb item={item} height={56} radius={12} /></div>
         <div>
           <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 15.5, color: T.ink }}>{item.name}</div>
-          <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: T.inkSoft }}>{item.cat}</div>
+          <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: T.inkSoft }}>{window.normCat(item.cat)}</div>
         </div>
       </div>
 

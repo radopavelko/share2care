@@ -95,7 +95,7 @@ function ItemPickRow({ app, item, on, onToggle }) {
       <div style={{ width: 40, flexShrink: 0 }}><window.ItemThumb item={item} height={40} radius={9} /></div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 14.5, color: T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</div>
-        <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12, color: T.inkSoft }}>{item.cat}</div>
+        <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12, color: T.inkSoft }}>{window.normCat(item.cat)}</div>
       </div>
       <div style={{
         width: 22, height: 22, borderRadius: '50%', flexShrink: 0,

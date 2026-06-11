@@ -42,7 +42,7 @@ function LendScreen({ app }) {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 15, color: T.ink }}>{it.name}</div>
                       <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkSoft, marginTop: 1 }}>
-                        {it.cat}{groupNames(app, it.groups) ? ' · ' + groupNames(app, it.groups) : ''}
+                        {window.normCat(it.cat)}{groupNames(app, it.groups) ? ' · ' + groupNames(app, it.groups) : ''}
                       </div>
                     </div>
                     <window.StatusBadge status={it.status} due={it.due} small />
@@ -69,7 +69,6 @@ function NewItemSheet({ app }) {
   const [busy, setBusy] = useStateG(false);
   const [gsel, setGsel] = useStateG(() => (app.groupId ? [app.groupId] : []));
   const fileRef = useRefG(null);
-  const conds = ['Like new', 'Good', 'Well-loved'];
   const ready = name.trim() && cat && !busy;
   const previewItem = { name: name || 'Your item', cat: cat || 'Home', cond, photoURL: preview };
 
@@ -126,20 +125,6 @@ function NewItemSheet({ app }) {
               fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, fontWeight: 600,
               border: `1.5px solid ${cat === c ? T.accent : T.line}`,
               background: cat === c ? T.accent : T.surface, color: cat === c ? '#fff' : T.inkSoft,
-              transition: 'all .14s ease',
-            }}>{c}</button>
-          ))}
-        </div>
-      </window.Field>
-
-      <window.Field label="Condition">
-        <div style={{ display: 'flex', gap: 8 }}>
-          {conds.map(c => (
-            <button key={c} onClick={() => setCond(c)} style={{
-              flex: 1, padding: '11px 8px', borderRadius: 13, cursor: 'pointer',
-              fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, fontWeight: 600,
-              border: `1.5px solid ${cond === c ? T.accent : T.line}`,
-              background: cond === c ? T.accentSoft : T.surface, color: cond === c ? T.accentDeep : T.inkSoft,
               transition: 'all .14s ease',
             }}>{c}</button>
           ))}

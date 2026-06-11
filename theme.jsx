@@ -88,7 +88,8 @@ function AvatarPhoto({ src, alt, size, ringStyle, fallback }) {
 
 // Category thumbnail — shows the uploaded photo when present, else a warm placeholder tile.
 function ItemThumb({ item, height = 132, radius = 16 }) {
-  const meta = window.CAT_META[item.cat] || { tint: '#E9E2D5', shape: 'circle' };
+  const cat = window.normCat(item.cat);
+  const meta = window.CAT_META[cat] || { tint: '#E9E2D5', shape: 'circle' };
   const showTag = height >= 78;
   const shapeStyle = {
     position: 'absolute', width: '52%', aspectRatio: '1',
@@ -121,7 +122,7 @@ function ItemThumb({ item, height = 132, radius = 16 }) {
           textTransform: 'lowercase', color: THEME.inkSoft,
           background: 'rgba(255,255,255,0.82)', padding: '3px 7px', borderRadius: 6,
           backdropFilter: 'blur(2px)',
-        }}>{item.cat}</div>
+        }}>{cat}</div>
       )}
     </div>
   );

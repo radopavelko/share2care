@@ -199,7 +199,7 @@ function ProfileScreen({ app }) {
                 <div style={{ width: 48, flexShrink: 0 }}><window.ItemThumb item={it} height={48} radius={10} /></div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 15, color: T.ink }}>{it.name}</div>
-                  <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkSoft, marginTop: 2 }}>{it.cat}</div>
+                  <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkSoft, marginTop: 2 }}>{window.normCat(it.cat)}</div>
                 </div>
                 <window.StatusBadge status={it.status} due={it.due} small />
               </div>

@@ -32,20 +32,29 @@ function relativeDue(iso) {
   return { label: `Due ${fmtDate(iso)}`, tone: 'ok' };
 }
 
-const CATEGORIES = ['Tools', 'Kitchen', 'Outdoors', 'Tech', 'Home', 'Kids', 'Sports', 'Books & Games'];
+// Five broad categories keep browsing and the add-item form quick. Items saved
+// under the old 8-category set are mapped onto these via normCat so they keep
+// filtering and displaying correctly.
+const CATEGORIES = ['Tools', 'Home & Kitchen', 'Outdoors & Sports', 'Tech', 'Kids & Games'];
+const LEGACY_CATS = {
+  'Kitchen': 'Home & Kitchen',
+  'Home': 'Home & Kitchen',
+  'Outdoors': 'Outdoors & Sports',
+  'Sports': 'Outdoors & Sports',
+  'Kids': 'Kids & Games',
+  'Books & Games': 'Kids & Games',
+};
+function normCat(c) { return LEGACY_CATS[c] || c || 'Home & Kitchen'; }
 const CAT_META = {
-  'Tools':         { tint: '#ECE3D4', shape: 'circle' },
-  'Kitchen':       { tint: '#EEDFD7', shape: 'square' },
-  'Outdoors':      { tint: '#DEE7DC', shape: 'diamond' },
-  'Tech':          { tint: '#E2E2DA', shape: 'circle' },
-  'Home':          { tint: '#E9E2D1', shape: 'square' },
-  'Kids':          { tint: '#EDE1D4', shape: 'diamond' },
-  'Sports':        { tint: '#DDE6E2', shape: 'circle' },
-  'Books & Games': { tint: '#ECE0D8', shape: 'square' },
+  'Tools':            { tint: '#ECE3D4', shape: 'circle' },
+  'Home & Kitchen':   { tint: '#EEDFD7', shape: 'square' },
+  'Outdoors & Sports':{ tint: '#DEE7DC', shape: 'diamond' },
+  'Tech':             { tint: '#E2E2DA', shape: 'circle' },
+  'Kids & Games':     { tint: '#EDE1D4', shape: 'diamond' },
 };
 
 Object.assign(window, {
   todayMidnight, addDays, isoFromOffset, fmtDate, daysUntil, relativeDue,
-  CATEGORIES, CAT_META,
+  CATEGORIES, CAT_META, normCat,
   MEMBERS: {}, // live lookup of users, synced by App
 });
