@@ -43,6 +43,7 @@ function BorrowsScreen({ app }) {
               {incoming.map(r => {
                 const it = byId(r.itemId); const from = window.MEMBERS[r.fromUid];
                 if (!it || !from) return null;
+                const market = !r.due ? window.marketInfo(it) : null;
                 return (
                   <window.Card key={r.id} style={{ padding: 14 }}>
                     <div style={{ display: 'flex', gap: 12 }}>
@@ -50,15 +51,24 @@ function BorrowsScreen({ app }) {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 3 }}>
                           <window.Avatar user={from} size={20} />
-                          <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, color: T.inkSoft }}><b style={{ color: T.ink }}>{from.name}</b> wants</span>
+                          <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, color: T.inkSoft }}><b style={{ color: T.ink }}>{from.name}</b> {market ? (market.kind === 'sell' ? 'wants to buy' : 'will take') : 'wants'}</span>
                         </div>
                         <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 15.5, color: T.ink }}>{it.name}</div>
-                        <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: T.inkSoft, marginTop: 2 }}>until {window.fmtDate(r.due)}</div>
+                        {market ? (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 2 }}>
+                            <window.Icon name={market.icon} size={13} color={market.color} />
+                            <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, fontWeight: 700, color: market.color }}>{market.label}</span>
+                          </div>
+                        ) : (
+                          <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: T.inkSoft, marginTop: 2 }}>until {window.fmtDate(r.due)}</div>
+                        )}
                       </div>
                     </div>
                     {r.note && <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: T.inkSoft, fontStyle: 'italic', background: T.surfaceAlt, borderRadius: 12, padding: '9px 12px', margin: '11px 0 0', textWrap: 'pretty' }}>“{r.note}”</div>}
                     <div style={{ display: 'flex', gap: 9, marginTop: 12 }}>
-                      <window.Btn variant="good" size="sm" full onClick={() => app.respondRequest(r.id, true)}><window.Icon name="check" size={17} /> Lend it</window.Btn>
+                      <window.Btn variant="good" size="sm" full onClick={() => app.respondRequest(r.id, true)}>
+                        <window.Icon name="check" size={17} /> {market ? (market.kind === 'sell' ? 'Sell it' : 'Give it') : 'Lend it'}
+                      </window.Btn>
                       <window.Btn variant="danger" size="sm" full onClick={() => app.respondRequest(r.id, false)}>Not now</window.Btn>
                     </div>
                   </window.Card>

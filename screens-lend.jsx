@@ -92,16 +92,17 @@ function NewItemSheet({ app }) {
   const [cat, setCat] = useStateG('');
   const [cond, setCond] = useStateG('Good');
   const [desc, setDesc] = useStateG('');
+  const [price, setPrice] = useStateG('');
   const [file, setFile] = useStateG(null);
   const [preview, setPreview] = useStateG('');
   const [busy, setBusy] = useStateG(false);
   const [gsel, setGsel] = useStateG(() => (app.groupId ? [app.groupId] : []));
   const fileRef = useRefG(null);
   const ready = name.trim() && cat && !busy;
-  const previewItem = { name: name || 'Your item', cat: cat || 'Home', cond, photoURL: preview };
+  const previewItem = { name: name || 'Your item', cat: cat || 'Home', cond, photoURL: preview, price };
 
   const reset = () => {
-    setName(''); setCat(''); setCond('Good'); setDesc(''); setBusy(false);
+    setName(''); setCat(''); setCond('Good'); setDesc(''); setPrice(''); setBusy(false);
     setGsel(app.groupId ? [app.groupId] : []);
     if (preview) URL.revokeObjectURL(preview);
     setFile(null); setPreview('');
@@ -120,7 +121,7 @@ function NewItemSheet({ app }) {
 
   const submit = async () => {
     setBusy(true);
-    await app.addItem({ name: name.trim(), cat, cond, desc: desc.trim() || 'Ask me anything about it!', file, groups: gsel });
+    await app.addItem({ name: name.trim(), cat, cond, desc: desc.trim() || 'Ask me anything about it!', file, price: price.trim(), groups: gsel });
     reset();
   };
 
@@ -148,6 +149,17 @@ function NewItemSheet({ app }) {
       <window.Field label="Category">
         <CategoryPicker value={cat} onChange={setCat} />
       </window.Field>
+
+      {cat === 'Sell' && (
+        <window.Field label="Price">
+          <input value={price} onChange={e => setPrice(e.target.value)} placeholder="e.g. 25 €" style={window.inputStyle(T)} />
+        </window.Field>
+      )}
+      {cat === 'Give Away' && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: -6, marginBottom: 18, fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, fontWeight: 600, color: window.CAT_META['Give Away'].chip }}>
+          <window.Icon name="gift" size={15} color={window.CAT_META['Give Away'].chip} /> Will be shown as Free
+        </div>
+      )}
 
       <window.Field label="Anything to know? (optional)">
         <textarea value={desc} onChange={e => setDesc(e.target.value)} rows={2} placeholder="Accessories, quirks, pickup notes…" style={{ ...window.inputStyle(T), resize: 'none' }} />
@@ -197,12 +209,13 @@ function EditItemForm({ app, item }) {
   const [name, setName] = useStateG(item.name);
   const [cat, setCat] = useStateG(window.normCat(item.cat));
   const [desc, setDesc] = useStateG(item.desc || '');
+  const [price, setPrice] = useStateG(item.price || '');
   const [file, setFile] = useStateG(null);
   const [preview, setPreview] = useStateG('');
   const [busy, setBusy] = useStateG(false);
   const fileRef = useRefG(null);
   const ready = name.trim() && cat && !busy;
-  const previewItem = { name, cat, photoURL: preview || item.photoURL };
+  const previewItem = { name, cat, photoURL: preview || item.photoURL, price };
 
   const pick = (e) => {
     const f = e.target.files && e.target.files[0];
@@ -219,7 +232,7 @@ function EditItemForm({ app, item }) {
 
   const submit = async () => {
     setBusy(true);
-    await app.editItem(item.id, { name: name.trim(), cat, desc: desc.trim(), file });
+    await app.editItem(item.id, { name: name.trim(), cat, desc: desc.trim(), file, price: price.trim() });
     if (preview) URL.revokeObjectURL(preview);
   };
 
@@ -242,6 +255,17 @@ function EditItemForm({ app, item }) {
       <window.Field label="Category">
         <CategoryPicker value={cat} onChange={setCat} />
       </window.Field>
+
+      {cat === 'Sell' && (
+        <window.Field label="Price">
+          <input value={price} onChange={e => setPrice(e.target.value)} placeholder="e.g. 25 €" style={window.inputStyle(T)} />
+        </window.Field>
+      )}
+      {cat === 'Give Away' && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: -6, marginBottom: 18, fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, fontWeight: 600, color: window.CAT_META['Give Away'].chip }}>
+          <window.Icon name="gift" size={15} color={window.CAT_META['Give Away'].chip} /> Will be shown as Free
+        </div>
+      )}
 
       <window.Field label="Anything to know? (optional)">
         <textarea value={desc} onChange={e => setDesc(e.target.value)} rows={2} placeholder="Accessories, quirks, pickup notes…" style={{ ...window.inputStyle(T), resize: 'none' }} />

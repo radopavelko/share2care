@@ -98,6 +98,7 @@ function AvatarPhoto({ src, alt, size, ringStyle, fallback }) {
 function ItemThumb({ item, height = 132, radius = 16 }) {
   const cat = window.normCat(item.cat);
   const meta = window.CAT_META[cat] || { tint: '#E9E2D5', shape: 'circle' };
+  const market = window.marketInfo(item);
   const showTag = height >= 78;
   const shapeStyle = {
     position: 'absolute', width: '52%', aspectRatio: '1',
@@ -136,6 +137,17 @@ function ItemThumb({ item, height = 132, radius = 16 }) {
           {cat}
         </div>
       )}
+      {showTag && market && (
+        <div style={{
+          position: 'absolute', top: 10, right: 10, zIndex: 2,
+          display: 'flex', alignItems: 'center', gap: 4,
+          background: market.color, color: '#fff', padding: '3px 8px', borderRadius: 999,
+          fontFamily: 'DM Sans, sans-serif', fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap',
+        }}>
+          <Icon name={market.icon} size={11} color="#fff" />
+          {market.label}
+        </div>
+      )}
     </div>
   );
 }
@@ -143,6 +155,7 @@ function ItemThumb({ item, height = 132, radius = 16 }) {
 function StatusBadge({ status, due, small = false }) {
   let bg = THEME.goodSoft, fg = THEME.good, label = 'Available', dot = THEME.good;
   if (status === 'pending') { bg = THEME.accentSoft; fg = THEME.accentDeep; label = 'Requested'; dot = THEME.accent; }
+  else if (status === 'gone') { bg = '#E7E0D6'; fg = THEME.inkSoft; label = 'Taken'; dot = THEME.inkFaint; }
   else if (status === 'out') {
     const r = due ? window.relativeDue(due) : null;
     bg = '#EFE7DA'; fg = THEME.inkSoft; dot = THEME.inkFaint; label = 'On loan';

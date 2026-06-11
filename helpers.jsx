@@ -60,8 +60,17 @@ const CAT_META = {
   'Sell':      { tint: '#F2E6C8', shape: 'diamond', icon: 'tag',   chip: '#B07A2E' },
 };
 
+// For Sell / Give Away items: what little badge and flow they get.
+// Returns null for regular (lending) categories.
+function marketInfo(item) {
+  const c = normCat(item.cat);
+  if (c === 'Sell') return { kind: 'sell', label: (item.price || '').trim() || 'For sale', icon: 'tag', color: CAT_META['Sell'].chip };
+  if (c === 'Give Away') return { kind: 'give', label: 'Free', icon: 'gift', color: CAT_META['Give Away'].chip };
+  return null;
+}
+
 Object.assign(window, {
   todayMidnight, addDays, isoFromOffset, fmtDate, daysUntil, relativeDue,
-  CATEGORIES, CAT_META, normCat,
+  CATEGORIES, CAT_META, normCat, marketInfo,
   MEMBERS: {}, // live lookup of users, synced by App
 });

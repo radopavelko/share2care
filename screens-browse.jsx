@@ -228,6 +228,7 @@ function ItemDetail({ app, item }) {
   const isMine = item.ownerUid === uid;
   const borrower = item.borrowerUid ? window.MEMBERS[item.borrowerUid] : null;
   const myPending = app.requests.find(r => r.itemId === item.id && r.fromUid === uid && r.status === 'pending');
+  const market = window.marketInfo(item);
 
   return (
     <div style={{ position: 'absolute', inset: 0, background: T.bg, zIndex: 150, overflowY: 'auto', animation: 'screenIn .28s cubic-bezier(.16,1,.3,1) both' }}>
@@ -251,6 +252,13 @@ function ItemDetail({ app, item }) {
           </div>
           <div style={{ marginTop: 4 }}><window.StatusBadge status={item.status} due={item.due} /></div>
         </div>
+
+        {market && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12 }}>
+            <window.Icon name={market.icon} size={19} color={market.color} />
+            <span style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 700, fontSize: 21, color: market.color, letterSpacing: -0.3 }}>{market.label}</span>
+          </div>
+        )}
 
         <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 15.5, lineHeight: 1.55, color: T.inkSoft, margin: '16px 0 22px', textWrap: 'pretty' }}>{item.desc}</p>
 
@@ -309,17 +317,37 @@ function ItemDetail({ app, item }) {
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '14px 20px max(30px, env(safe-area-inset-bottom))', background: `linear-gradient(to top, ${T.bg} 72%, transparent)` }}>
         {isMine ? (
           <div style={{ display: 'flex', gap: 10 }}>
-            <window.Btn variant="primary" full size="lg" onClick={() => app.openModal('editItem', item.id)}>
-              <window.Icon name="edit" size={18} /> Edit item
-            </window.Btn>
-            <window.Btn variant="ghost" full size="lg" onClick={() => app.goTab('borrows')}>My Loans</window.Btn>
+            {item.status === 'gone' ? (
+              <window.Btn variant="soft" full size="lg" onClick={() => app.markReturned(item.id)}>
+                <window.Icon name="box" size={18} /> Put back on shelf
+              </window.Btn>
+            ) : (
+              <window.Btn variant="primary" full size="lg" onClick={() => app.openModal('editItem', item.id)}>
+                <window.Icon name="edit" size={18} /> Edit item
+              </window.Btn>
+            )}
+            {item.status === 'gone' ? (
+              <window.Btn variant="ghost" full size="lg" onClick={() => app.openModal('editItem', item.id)}>
+                <window.Icon name="edit" size={18} /> Edit
+              </window.Btn>
+            ) : (
+              <window.Btn variant="ghost" full size="lg" onClick={() => app.goTab('borrows')}>My Loans</window.Btn>
+            )}
           </div>
         ) : myPending ? (
           <window.Btn variant="soft" full size="lg" disabled>Request pending…</window.Btn>
         ) : item.status === 'available' ? (
-          <window.Btn variant="primary" full size="lg" onClick={() => setSheet(true)}>
-            <window.Icon name="heart" size={19} /> Ask to borrow
-          </window.Btn>
+          market ? (
+            <window.Btn variant="primary" full size="lg" onClick={() => setSheet(true)}>
+              <window.Icon name={market.icon} size={19} /> {market.kind === 'sell' ? 'I’m interested' : 'I’ll take it'}
+            </window.Btn>
+          ) : (
+            <window.Btn variant="primary" full size="lg" onClick={() => setSheet(true)}>
+              <window.Icon name="heart" size={19} /> Ask to borrow
+            </window.Btn>
+          )
+        ) : market ? (
+          <window.Btn variant="soft" full size="lg" disabled>{item.status === 'gone' ? 'Already taken' : 'Someone asked first…'}</window.Btn>
         ) : (
           <window.Btn variant="ghost" full size="lg" onClick={() => app.notifyWhenFree(item)}>
             <window.Icon name="bell" size={18} /> Notify me when it’s free
@@ -327,7 +355,9 @@ function ItemDetail({ app, item }) {
         )}
       </div>
 
-      <BorrowSheet app={app} item={item} open={sheet} onClose={() => setSheet(false)} />
+      {market
+        ? <InterestSheet app={app} item={item} market={market} open={sheet} onClose={() => setSheet(false)} />
+        : <BorrowSheet app={app} item={item} open={sheet} onClose={() => setSheet(false)} />}
     </div>
   );
 }
@@ -382,6 +412,50 @@ function BorrowSheet({ app, item, open, onClose }) {
       }} />
 
       <window.Btn variant="primary" full size="lg" onClick={submit}>Send request to {owner.name}</window.Btn>
+    </window.Sheet>
+  );
+}
+
+// ── INTEREST SHEET (Sell / Give Away — no due date) ────────────
+function InterestSheet({ app, item, market, open, onClose }) {
+  const T = window.THEME;
+  const owner = window.MEMBERS[item.ownerUid] || { name: 'the owner' };
+  const [note, setNote] = useStateB('');
+
+  const submit = () => {
+    app.requestBorrow(item.id, null, note.trim());
+    onClose();
+  };
+
+  return (
+    <window.Sheet open={open} onClose={onClose} title={market.kind === 'sell' ? `Buy from ${owner.name}` : `Ask ${owner.name} for it`}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+        <div style={{ width: 56 }}><window.ItemThumb item={item} height={56} radius={12} /></div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 15.5, color: T.ink }}>{item.name}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 2 }}>
+            <window.Icon name={market.icon} size={14} color={market.color} />
+            <span style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: 14, color: market.color }}>{market.label}</span>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: T.inkSoft, marginBottom: 16, lineHeight: 1.5, textWrap: 'pretty' }}>
+        {market.kind === 'sell'
+          ? `${owner.name} will get your request and you can sort out payment and pickup between you.`
+          : `${owner.name} will get your request — first come, first served.`}
+      </div>
+
+      <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 14, color: T.ink, marginBottom: 9 }}>Add a note <span style={{ color: T.inkFaint, fontWeight: 400 }}>(optional)</span></div>
+      <textarea value={note} onChange={e => setNote(e.target.value)} placeholder={`Hi ${owner.name}! Still available?`} rows={2} style={{
+        width: '100%', boxSizing: 'border-box', resize: 'none', border: `1.5px solid ${T.line}`,
+        borderRadius: 14, padding: '12px 14px', fontFamily: 'DM Sans, sans-serif', fontSize: 14.5,
+        color: T.ink, outline: 'none', marginBottom: 18, background: T.surfaceAlt,
+      }} />
+
+      <window.Btn variant="primary" full size="lg" onClick={submit}>
+        <window.Icon name={market.icon} size={18} /> Send to {owner.name}
+      </window.Btn>
     </window.Sheet>
   );
 }

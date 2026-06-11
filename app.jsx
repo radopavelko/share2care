@@ -213,14 +213,14 @@ function App({ me }) {
 
     inviteLink: (g) => `${window.location.origin}${window.location.pathname}?join=${g.code}`,
 
-    addItem: async ({ name, cat, cond, desc, file, groups: gids }) => {
+    addItem: async ({ name, cat, cond, desc, file, price, groups: gids }) => {
       setModal(null); setModalArg(null);
       try {
         let photoURL = '';
         if (file) { toast('Uploading photo…', 'camera'); photoURL = await window.S2.uploadPhoto(file, uid); }
         const shareGroups = gids && gids.length ? gids : (groupId ? [groupId] : []);
         await window.S2.addItem({
-          name, cat, cond, desc, photoURL, groups: shareGroups,
+          name, cat, cond, desc, photoURL, price: price || '', groups: shareGroups,
           ownerUid: uid, status: 'available', borrowerUid: null, due: null,
         });
         toast('Added to your shelf', 'box');
@@ -228,10 +228,10 @@ function App({ me }) {
       } catch (e) { console.error(e); toast('Could not add item', 'x'); }
     },
 
-    editItem: async (itemId, { name, cat, desc, file }) => {
+    editItem: async (itemId, { name, cat, desc, file, price }) => {
       setModal(null); setModalArg(null);
       try {
-        const patch = { name, cat, desc };
+        const patch = { name, cat, desc, price: price || '' };
         if (file) { toast('Uploading photo…', 'camera'); patch.photoURL = await window.S2.uploadPhoto(file, uid); }
         await window.S2.updateItem(itemId, patch);
         toast('Item updated', 'check');
@@ -253,8 +253,15 @@ function App({ me }) {
       const r = requests.find(x => x.id === reqId);
       if (!r) return;
       const from = members[r.fromUid];
+      const it = items.find(x => x.id === r.itemId);
+      const market = it ? window.marketInfo(it) : null;
       try {
-        if (accept) {
+        if (accept && !r.due && market) {
+          // Sell / Give Away: no loan — the item changes hands for good.
+          await window.S2.updateRequest(reqId, { status: 'approved' });
+          await window.S2.updateItem(r.itemId, { status: 'gone', borrowerUid: r.fromUid, due: null });
+          toast(market.kind === 'sell' ? `Sold to ${from ? from.name : 'them'}` : `Given to ${from ? from.name : 'them'}`, 'check');
+        } else if (accept) {
           await window.S2.approveRequest(reqId, r.itemId, r.fromUid, r.due);
           toast(`Lent to ${from ? from.name : 'them'} · back ${window.fmtDate(r.due)}`, 'check');
         } else {
