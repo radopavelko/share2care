@@ -228,6 +228,16 @@ function App({ me }) {
       } catch (e) { console.error(e); toast('Could not add item', 'x'); }
     },
 
+    editItem: async (itemId, { name, cat, desc, file }) => {
+      setModal(null); setModalArg(null);
+      try {
+        const patch = { name, cat, desc };
+        if (file) { toast('Uploading photo…', 'camera'); patch.photoURL = await window.S2.uploadPhoto(file, uid); }
+        await window.S2.updateItem(itemId, patch);
+        toast('Item updated', 'check');
+      } catch (e) { console.error(e); toast('Could not update item', 'x'); }
+    },
+
     requestBorrow: async (itemId, due, note) => {
       const it = items.find(i => i.id === itemId);
       if (!it) return;
@@ -340,6 +350,7 @@ function App({ me }) {
 
       <window.Toast toast={toastData} />
       <window.NewItemSheet app={app} />
+      <window.EditItemSheet app={app} />
       <window.GroupSheets app={app} />
     </div>
   );

@@ -41,6 +41,14 @@ function Icon({ name, size = 22, color = 'currentColor', stroke = 2 }) {
     box:     <><path d="M4 8l8-4 8 4-8 4-8-4zM4 8v8l8 4 8-4V8M12 12v8" {...p} /></>,
     logout:  <><path d="M15 12H4M11 6l-6 6 6 6" {...p} /><path d="M14 4h5v16h-5" {...p} /></>,
     users:   <><circle cx="9" cy="8" r="3.4" {...p} /><path d="M3.5 19c1-3.2 3.4-4.2 5.5-4.2s4.5 1 5.5 4.2" {...p} /><path d="M16 5.2a3.2 3.2 0 010 5.8M17.5 14.6c1.8.5 3.2 1.7 4 4.4" {...p} /></>,
+    tools:   <><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" {...p} /></>,
+    home:    <><path d="M4 11.5L12 4l8 7.5" {...p} /><path d="M6.5 10v9.5h11V10" {...p} /></>,
+    tree:    <><path d="M3 18.5l5.5-9 3.6 5.8 2.4-3.6 6 6.8H3z" {...p} /><circle cx="17.5" cy="6" r="1.8" {...p} /></>,
+    screen:  <><rect x="3.5" y="5" width="17" height="11.5" rx="2" {...p} /><path d="M9.5 20h5M12 16.5V20" {...p} /></>,
+    dots:    <><circle cx="5.5" cy="12" r="1.4" {...p} /><circle cx="12" cy="12" r="1.4" {...p} /><circle cx="18.5" cy="12" r="1.4" {...p} /></>,
+    gift:    <><rect x="4" y="9.5" width="16" height="10" rx="1.8" {...p} /><path d="M4 13.5h16M12 9.5v10" {...p} /><path d="M12 9.5c-1.6 0-4.3-.6-4.3-2.7 0-1.7 2-2.2 3-1.2s1.3 3.9 1.3 3.9zM12 9.5c1.6 0 4.3-.6 4.3-2.7 0-1.7-2-2.2-3-1.2S12 9.5 12 9.5z" {...p} /></>,
+    tag:     <><path d="M20.2 12.6L12.6 20.2a1.8 1.8 0 01-2.5 0L3.5 13.6V5a1.5 1.5 0 011.5-1.5h8.6l6.6 6.6a1.8 1.8 0 010 2.5z" {...p} /><circle cx="8.3" cy="8.3" r="1.5" {...p} /></>,
+    edit:    <><path d="M4 20h4.5L19 9.5 14.5 5 4 15.5V20z" {...p} /><path d="M12.5 7l4.5 4.5" {...p} /></>,
     link:    <><path d="M9.5 13.5l5-5M8 11l-2 2a3.2 3.2 0 004.5 4.5l2-2M16 13l2-2A3.2 3.2 0 0013.5 6.5l-2 2" {...p} /></>,
     mail:    <><rect x="3.5" y="5.5" width="17" height="13" rx="2.5" {...p} /><path d="M4 7l8 5.5L20 7" {...p} /></>,
     copy:    <><rect x="9" y="9" width="11" height="11" rx="2.5" {...p} /><path d="M5 15H4.5A1.5 1.5 0 013 13.5v-9A1.5 1.5 0 014.5 3h9A1.5 1.5 0 0115 4.5V5" {...p} /></>,
@@ -118,11 +126,15 @@ function ItemThumb({ item, height = 132, radius = 16 }) {
       {showTag && (
         <div style={{
           position: 'absolute', top: 10, left: 10, zIndex: 2,
+          display: 'flex', alignItems: 'center', gap: 4,
           fontFamily: 'DM Mono, monospace', fontSize: 10.5, letterSpacing: 0.3,
-          textTransform: 'lowercase', color: THEME.inkSoft,
+          textTransform: 'lowercase', color: meta.chip || THEME.inkSoft,
           background: 'rgba(255,255,255,0.82)', padding: '3px 7px', borderRadius: 6,
           backdropFilter: 'blur(2px)',
-        }}>{cat}</div>
+        }}>
+          {meta.icon && <Icon name={meta.icon} size={11} color={meta.chip || THEME.inkSoft} />}
+          {cat}
+        </div>
       )}
     </div>
   );

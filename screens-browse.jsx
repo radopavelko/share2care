@@ -125,16 +125,25 @@ function BrowseScreen({ app }) {
       </div>
 
       <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '6px 20px 10px', scrollbarWidth: 'none' }} className="no-sb">
-        {cats.map(c => (
-          <button key={c} onClick={() => setCat(c)} style={{
-            flexShrink: 0, padding: '8px 14px', borderRadius: 999,
-            fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, fontWeight: 600, cursor: 'pointer',
-            border: `1.5px solid ${cat === c ? T.accent : T.line}`,
-            background: cat === c ? T.accent : T.surface,
-            color: cat === c ? '#fff' : T.inkSoft, whiteSpace: 'nowrap',
-            transition: 'all .14s ease',
-          }}>{c}</button>
-        ))}
+        {cats.map(c => {
+          const meta = window.CAT_META[c];
+          const accent = (meta && meta.chip) || T.accent;
+          const on = cat === c;
+          return (
+            <button key={c} onClick={() => setCat(c)} style={{
+              flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 6,
+              padding: '8px 14px', borderRadius: 999,
+              fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, fontWeight: 600, cursor: 'pointer',
+              border: `1.5px solid ${on ? accent : T.line}`,
+              background: on ? accent : T.surface,
+              color: on ? '#fff' : T.inkSoft, whiteSpace: 'nowrap',
+              transition: 'all .14s ease',
+            }}>
+              {meta && meta.icon && <window.Icon name={meta.icon} size={14} color={on ? '#fff' : accent} />}
+              {c}
+            </button>
+          );
+        })}
       </div>
 
       {incoming.length > 0 && (
@@ -299,7 +308,12 @@ function ItemDetail({ app, item }) {
 
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '14px 20px max(30px, env(safe-area-inset-bottom))', background: `linear-gradient(to top, ${T.bg} 72%, transparent)` }}>
         {isMine ? (
-          <window.Btn variant="ghost" full size="lg" onClick={() => app.goTab('borrows')}>Manage in My Loans</window.Btn>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <window.Btn variant="primary" full size="lg" onClick={() => app.openModal('editItem', item.id)}>
+              <window.Icon name="edit" size={18} /> Edit item
+            </window.Btn>
+            <window.Btn variant="ghost" full size="lg" onClick={() => app.goTab('borrows')}>My Loans</window.Btn>
+          </div>
         ) : myPending ? (
           <window.Btn variant="soft" full size="lg" disabled>Request pending…</window.Btn>
         ) : item.status === 'available' ? (

@@ -32,25 +32,32 @@ function relativeDue(iso) {
   return { label: `Due ${fmtDate(iso)}`, tone: 'ok' };
 }
 
-// Five broad categories keep browsing and the add-item form quick. Items saved
-// under the old 8-category set are mapped onto these via normCat so they keep
-// filtering and displaying correctly.
-const CATEGORIES = ['Tools', 'Home & Kitchen', 'Outdoors & Sports', 'Tech', 'Kids & Games'];
+// Five broad categories plus two "intent" ones — Give Away and Sell — which get
+// their own accent colour (meta.chip) so they stand out from regular lending.
+// Items saved under any earlier category set are mapped via normCat so they
+// keep filtering and displaying correctly.
+const CATEGORIES = ['Tools', 'Home', 'Outdoor', 'Tech', 'Other', 'Give Away', 'Sell'];
 const LEGACY_CATS = {
-  'Kitchen': 'Home & Kitchen',
-  'Home': 'Home & Kitchen',
-  'Outdoors': 'Outdoors & Sports',
-  'Sports': 'Outdoors & Sports',
-  'Kids': 'Kids & Games',
-  'Books & Games': 'Kids & Games',
+  // original 8-category era
+  'Kitchen': 'Home',
+  'Outdoors': 'Outdoor',
+  'Sports': 'Outdoor',
+  'Kids': 'Other',
+  'Books & Games': 'Other',
+  // merged 5-category era
+  'Home & Kitchen': 'Home',
+  'Outdoors & Sports': 'Outdoor',
+  'Kids & Games': 'Other',
 };
-function normCat(c) { return LEGACY_CATS[c] || c || 'Home & Kitchen'; }
+function normCat(c) { return LEGACY_CATS[c] || c || 'Other'; }
 const CAT_META = {
-  'Tools':            { tint: '#ECE3D4', shape: 'circle' },
-  'Home & Kitchen':   { tint: '#EEDFD7', shape: 'square' },
-  'Outdoors & Sports':{ tint: '#DEE7DC', shape: 'diamond' },
-  'Tech':             { tint: '#E2E2DA', shape: 'circle' },
-  'Kids & Games':     { tint: '#EDE1D4', shape: 'diamond' },
+  'Tools':     { tint: '#ECE3D4', shape: 'circle',  icon: 'tools'  },
+  'Home':      { tint: '#EEDFD7', shape: 'square',  icon: 'home'   },
+  'Outdoor':   { tint: '#DEE7DC', shape: 'diamond', icon: 'tree'   },
+  'Tech':      { tint: '#E2E2DA', shape: 'circle',  icon: 'screen' },
+  'Other':     { tint: '#E9E2D1', shape: 'square',  icon: 'dots'   },
+  'Give Away': { tint: '#E0EBDC', shape: 'circle',  icon: 'gift',  chip: '#6E8B66' },
+  'Sell':      { tint: '#F2E6C8', shape: 'diamond', icon: 'tag',   chip: '#B07A2E' },
 };
 
 Object.assign(window, {

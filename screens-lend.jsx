@@ -57,6 +57,34 @@ function LendScreen({ app }) {
   );
 }
 
+// Category chips with their icon and accent colour (Give Away / Sell stand out).
+// Shared by the add-item and edit-item sheets.
+function CategoryPicker({ value, onChange }) {
+  const T = window.THEME;
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+      {window.CATEGORIES.map(c => {
+        const meta = window.CAT_META[c];
+        const accent = (meta && meta.chip) || T.accent;
+        const on = value === c;
+        return (
+          <button key={c} onClick={() => onChange(c)} style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            padding: '9px 13px', borderRadius: 999, cursor: 'pointer',
+            fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, fontWeight: 600,
+            border: `1.5px solid ${on ? accent : T.line}`,
+            background: on ? accent : T.surface, color: on ? '#fff' : T.inkSoft,
+            transition: 'all .14s ease',
+          }}>
+            {meta && meta.icon && <window.Icon name={meta.icon} size={14} color={on ? '#fff' : accent} />}
+            {c}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 // ── NEW ITEM form (sheet) with real photo upload ───────────────
 function NewItemSheet({ app }) {
   const T = window.THEME;
@@ -118,17 +146,7 @@ function NewItemSheet({ app }) {
       </window.Field>
 
       <window.Field label="Category">
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          {window.CATEGORIES.map(c => (
-            <button key={c} onClick={() => setCat(c)} style={{
-              padding: '9px 13px', borderRadius: 999, cursor: 'pointer',
-              fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, fontWeight: 600,
-              border: `1.5px solid ${cat === c ? T.accent : T.line}`,
-              background: cat === c ? T.accent : T.surface, color: cat === c ? '#fff' : T.inkSoft,
-              transition: 'all .14s ease',
-            }}>{c}</button>
-          ))}
-        </div>
+        <CategoryPicker value={cat} onChange={setCat} />
       </window.Field>
 
       <window.Field label="Anything to know? (optional)">
@@ -165,4 +183,75 @@ function NewItemSheet({ app }) {
   );
 }
 
-Object.assign(window, { LendScreen, NewItemSheet });
+// ── EDIT ITEM (owner only): update photo, name, category, notes ──
+function EditItemSheet({ app }) {
+  if (app.modal !== 'editItem') return null;
+  const item = app.items.find(i => i.id === app.modalArg);
+  if (!item || item.ownerUid !== app.uid) return null;
+  // keyed by item id so the form state re-initialises per item
+  return <EditItemForm key={item.id} app={app} item={item} />;
+}
+
+function EditItemForm({ app, item }) {
+  const T = window.THEME;
+  const [name, setName] = useStateG(item.name);
+  const [cat, setCat] = useStateG(window.normCat(item.cat));
+  const [desc, setDesc] = useStateG(item.desc || '');
+  const [file, setFile] = useStateG(null);
+  const [preview, setPreview] = useStateG('');
+  const [busy, setBusy] = useStateG(false);
+  const fileRef = useRefG(null);
+  const ready = name.trim() && cat && !busy;
+  const previewItem = { name, cat, photoURL: preview || item.photoURL };
+
+  const pick = (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    if (preview) URL.revokeObjectURL(preview);
+    setFile(f);
+    setPreview(URL.createObjectURL(f));
+  };
+
+  const close = () => {
+    if (preview) URL.revokeObjectURL(preview);
+    app.closeModal();
+  };
+
+  const submit = async () => {
+    setBusy(true);
+    await app.editItem(item.id, { name: name.trim(), cat, desc: desc.trim(), file });
+    if (preview) URL.revokeObjectURL(preview);
+  };
+
+  return (
+    <window.Sheet open title="Edit item" onClose={close}>
+      <input ref={fileRef} type="file" accept="image/*" onChange={pick} style={{ display: 'none' }} />
+      <button onClick={() => fileRef.current && fileRef.current.click()} style={{ width: '100%', border: 'none', background: 'none', padding: 0, cursor: 'pointer', marginBottom: 18 }}>
+        <div style={{ position: 'relative' }}>
+          <window.ItemThumb item={previewItem} height={150} radius={16} />
+          <div style={{ position: 'absolute', bottom: 10, right: 10, display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.92)', borderRadius: 10, padding: '6px 11px', fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, fontWeight: 600, color: T.inkSoft }}>
+            <window.Icon name="camera" size={14} /> {previewItem.photoURL ? 'Change photo' : 'Add photo'}
+          </div>
+        </div>
+      </button>
+
+      <window.Field label="What is it?">
+        <input value={name} onChange={e => setName(e.target.value)} style={window.inputStyle(T)} />
+      </window.Field>
+
+      <window.Field label="Category">
+        <CategoryPicker value={cat} onChange={setCat} />
+      </window.Field>
+
+      <window.Field label="Anything to know? (optional)">
+        <textarea value={desc} onChange={e => setDesc(e.target.value)} rows={2} placeholder="Accessories, quirks, pickup notes…" style={{ ...window.inputStyle(T), resize: 'none' }} />
+      </window.Field>
+
+      <window.Btn variant="primary" full size="lg" disabled={!ready} onClick={submit}>
+        <window.Icon name="check" size={19} /> {busy ? 'Saving…' : 'Save changes'}
+      </window.Btn>
+    </window.Sheet>
+  );
+}
+
+Object.assign(window, { LendScreen, NewItemSheet, EditItemSheet });
