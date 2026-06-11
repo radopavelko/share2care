@@ -70,14 +70,48 @@ function GroupSwitcherSheet({ app }) {
         })}
       </div>
 
-      <div style={{ display: 'flex', gap: 10, marginBottom: 6 }}>
-        <window.Btn variant="primary" full onClick={() => app.openModal('createGroup')}>
-          <window.Icon name="plus" size={18} /> Create
-        </window.Btn>
-        <window.Btn variant="ghost" full onClick={() => app.openModal('joinGroup')}>
-          <window.Icon name="link" size={18} /> Join
-        </window.Btn>
+      <window.Btn variant="ghost" full onClick={() => app.openModal('joinGroup')}>
+        <window.Icon name="link" size={18} /> Join a group
+      </window.Btn>
+      <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkFaint, textAlign: 'center', marginTop: 10 }}>
+        You can create new groups from the You tab.
       </div>
+    </window.Sheet>
+  );
+}
+
+// ── Add to shelf: something new, or share an existing item ─────
+function AddToShelfSheet({ app }) {
+  const T = window.THEME;
+  const g = app.group;
+  // your items that aren't in the current group yet
+  const candidates = g
+    ? app.items.filter(it => it.ownerUid === app.uid && !(it.groups || []).includes(g.id))
+    : [];
+  return (
+    <window.Sheet open title={g ? `Add to ${g.name}` : 'Add to your shelf'} onClose={app.closeModal}>
+      <window.Btn variant="primary" full size="lg" onClick={() => app.openModal('newItem')}>
+        <window.Icon name="plus" size={19} /> Add something new
+      </window.Btn>
+      {g && (
+        <div style={{ marginTop: 20 }}>
+          <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 13.5, color: T.ink, marginBottom: 9 }}>
+            Or share one of your things
+          </div>
+          {candidates.length === 0 ? (
+            <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, color: T.inkFaint, padding: '12px 14px', background: T.surfaceAlt, borderRadius: 13, border: `1px dashed ${T.line}` }}>
+              All your things are already in this group.
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {candidates.map(it => (
+                <ItemPickRow key={it.id} app={app} item={it} on={false}
+                  onToggle={() => app.toggleItemGroup(it, g.id)} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </window.Sheet>
   );
 }
@@ -283,6 +317,7 @@ function GroupSheets({ app }) {
     case 'createGroup':   return <CreateGroupSheet app={app} />;
     case 'joinGroup':     return <JoinGroupSheet app={app} />;
     case 'manageGroup':   return <ManageGroupSheet app={app} />;
+    case 'addToShelf':    return <AddToShelfSheet app={app} />;
     default: return null;
   }
 }

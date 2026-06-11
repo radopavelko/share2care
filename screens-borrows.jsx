@@ -191,6 +191,39 @@ function ProfileScreen({ app }) {
       </div>
 
       <div style={{ padding: '24px 20px 0' }}>
+        <SectionLabel count={app.groups.length}>Your groups</SectionLabel>
+        {app.groups.length === 0 ? (
+          <EmptyHint text="No groups yet. Create one and invite people with a link or their email." />
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {app.groups.map(g => (
+              <window.Card key={g.id} onClick={() => app.openModal('manageGroup', g.id)} style={{ padding: '12px 14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{
+                    width: 38, height: 38, borderRadius: 11, flexShrink: 0, background: T.accentSoft,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}><window.Icon name="users" size={19} color={T.accentDeep} /></div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 15, color: T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{g.name}</div>
+                    <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkSoft, marginTop: 1 }}>
+                      {(g.memberUids || []).length} {(g.memberUids || []).length === 1 ? 'member' : 'members'}{g.ownerUid === uid ? ' · you’re the admin' : ''}
+                    </div>
+                  </div>
+                  <window.Icon name="chevron" size={17} color={T.inkFaint} />
+                </div>
+              </window.Card>
+            ))}
+          </div>
+        )}
+        <button onClick={() => app.openModal('createGroup')} style={{
+          width: '100%', marginTop: 12, padding: '13px', borderRadius: 14, cursor: 'pointer',
+          border: `1.5px dashed ${T.line}`, background: 'transparent', color: T.accentDeep,
+          fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 14.5,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+        }}><window.Icon name="users" size={18} /> Create a group</button>
+      </div>
+
+      <div style={{ padding: '24px 20px 0' }}>
         <SectionLabel count={myItems.length}>On your shelf</SectionLabel>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {myItems.map(it => (

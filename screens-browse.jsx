@@ -35,7 +35,7 @@ function GetStartedCard({ app }) {
   const T = window.THEME;
   const steps = [
     { icon: 'box', title: 'Add something you own', sub: 'A drill, a tent, a board game — anything worth sharing.' },
-    { icon: 'users', title: 'Create a group', sub: 'Then invite people with a link or their email.' },
+    { icon: 'users', title: 'Create a group', sub: 'From the You tab — then invite people with a link or their email.' },
     { icon: 'swap', title: 'Borrow each other’s things', sub: 'Ask, lend, and return — all in one place.' },
   ];
   return (
@@ -59,10 +59,6 @@ function GetStartedCard({ app }) {
         </div>
         <window.Btn variant="primary" full onClick={() => app.openModal('newItem')}>
           <window.Icon name="plus" size={18} /> Add your first thing
-        </window.Btn>
-        <div style={{ height: 9 }} />
-        <window.Btn variant="ghost" full onClick={() => app.openModal('createGroup')}>
-          <window.Icon name="users" size={18} /> Create a group
         </window.Btn>
       </window.Card>
     </div>
@@ -175,6 +171,24 @@ function BrowseScreen({ app }) {
             </div>
           </window.Card>
         ))}
+        {/* Add tile: in a group, choose new vs. one of your existing things;
+            on "All things", go straight to the new-item form. */}
+        {!q && list.length > 0 && (
+          <button
+            onClick={() => app.openModal(app.group ? 'addToShelf' : 'newItem')}
+            style={{
+              minHeight: 180, borderRadius: 18, cursor: 'pointer',
+              border: `1.5px dashed ${T.line}`, background: 'transparent',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              gap: 9, color: T.inkSoft, WebkitTapHighlightColor: 'transparent',
+            }}>
+            <div style={{
+              width: 40, height: 40, borderRadius: 13, background: T.accentSoft,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}><window.Icon name="plus" size={20} color={T.accentDeep} /></div>
+            <span style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 13.5 }}>Add</span>
+          </button>
+        )}
       </div>
       {list.length === 0 && (
         q ? (
@@ -184,8 +198,8 @@ function BrowseScreen({ app }) {
         ) : app.group ? (
           <div style={{ textAlign: 'center', padding: '42px 30px', fontFamily: 'DM Sans, sans-serif' }}>
             <div style={{ fontSize: 15, color: T.inkFaint, marginBottom: 14, textWrap: 'pretty' }}>Nothing in {app.group.name} yet.</div>
-            <window.Btn variant="soft" size="sm" onClick={() => app.openModal('manageGroup', app.group.id)}>
-              <window.Icon name="plus" size={16} /> Add your items
+            <window.Btn variant="soft" size="sm" onClick={() => app.openModal('addToShelf')}>
+              <window.Icon name="plus" size={16} /> Add things
             </window.Btn>
           </div>
         ) : (
