@@ -51,13 +51,13 @@ const LEGACY_CATS = {
 };
 function normCat(c) { return LEGACY_CATS[c] || c || 'Other'; }
 const CAT_META = {
-  'Tools':     { tint: '#ECE3D4', shape: 'circle',  icon: 'tools'  },
-  'Home':      { tint: '#EEDFD7', shape: 'square',  icon: 'home'   },
-  'Outdoor':   { tint: '#DEE7DC', shape: 'diamond', icon: 'tree'   },
-  'Tech':      { tint: '#E2E2DA', shape: 'circle',  icon: 'screen' },
-  'Other':     { tint: '#E9E2D1', shape: 'square',  icon: 'dots'   },
-  'Give Away': { tint: '#E0EBDC', shape: 'circle',  icon: 'gift',  chip: '#6E8B66' },
-  'Sell':      { tint: '#F2E6C8', shape: 'diamond', icon: 'tag',   chip: '#B07A2E' },
+  'Tools':     { tint: '#F3F2EF', shape: 'circle',  icon: 'tools'  },
+  'Home':      { tint: '#F6F1EC', shape: 'square',  icon: 'home'   },
+  'Outdoor':   { tint: '#EFF3EE', shape: 'diamond', icon: 'tree'   },
+  'Tech':      { tint: '#EFF0F3', shape: 'circle',  icon: 'screen' },
+  'Other':     { tint: '#F2EFEA', shape: 'square',  icon: 'dots'   },
+  'Give Away': { tint: '#F3F2EF', shape: 'circle',  icon: 'gift',  chip: '#111111' },
+  'Sell':      { tint: '#FBE9E8', shape: 'diamond', icon: 'tag',   chip: '#E8312B' },
 };
 
 // For Sell / Give Away items: what little badge and flow they get.

@@ -17,7 +17,7 @@ function GroupSwitcher({ app }) {
     }}>
       <window.Icon name="users" size={16} color={T.accent} />
       <span style={{
-        fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 13.5, color: T.ink,
+        fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 13.5, color: T.ink,
         whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 150,
       }}>{label}</span>
       <window.Icon name="chevron" size={15} color={T.inkFaint} stroke={2.4} />
@@ -54,13 +54,13 @@ function GroupSwitcherSheet({ app }) {
                 <window.Icon name={r.id ? 'users' : 'box'} size={19} />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 15, color: active ? T.accentDeep : T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.name}</div>
-                <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkSoft }}>{r.sub}</div>
+                <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 15, color: active ? T.accentDeep : T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.name}</div>
+                <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, color: T.inkSoft }}>{r.sub}</div>
               </div>
               {r.g && (
                 <button onClick={e => { e.stopPropagation(); app.openModal('manageGroup', r.id); }} style={{
                   border: `1px solid ${T.line}`, background: T.surface, borderRadius: 10,
-                  padding: '7px 11px', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif',
+                  padding: '7px 11px', cursor: 'pointer', fontFamily: 'Inter, sans-serif',
                   fontSize: 12.5, fontWeight: 600, color: T.inkSoft, WebkitTapHighlightColor: 'transparent',
                 }}>Manage</button>
               )}
@@ -73,7 +73,7 @@ function GroupSwitcherSheet({ app }) {
       <window.Btn variant="ghost" full onClick={() => app.openModal('joinGroup')}>
         <window.Icon name="link" size={18} /> Join a group
       </window.Btn>
-      <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkFaint, textAlign: 'center', marginTop: 10 }}>
+      <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, color: T.inkFaint, textAlign: 'center', marginTop: 10 }}>
         You can create new groups from the You tab.
       </div>
     </window.Sheet>
@@ -95,11 +95,11 @@ function AddToShelfSheet({ app }) {
       </window.Btn>
       {g && (
         <div style={{ marginTop: 20 }}>
-          <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 13.5, color: T.ink, marginBottom: 9 }}>
+          <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 13.5, color: T.ink, marginBottom: 9 }}>
             Or share one of your things
           </div>
           {candidates.length === 0 ? (
-            <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, color: T.inkFaint, padding: '12px 14px', background: T.surfaceAlt, borderRadius: 13, border: `1px dashed ${T.line}` }}>
+            <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 13.5, color: T.inkFaint, padding: '12px 14px', background: T.surfaceAlt, borderRadius: 13, border: `1px dashed ${T.line}` }}>
               All your things are already in this group.
             </div>
           ) : (
@@ -128,8 +128,8 @@ function ItemPickRow({ app, item, on, onToggle }) {
     }}>
       <div style={{ width: 40, flexShrink: 0 }}><window.ItemThumb item={item} height={40} radius={9} /></div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 14.5, color: T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</div>
-        <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12, color: T.inkSoft }}>{window.normCat(item.cat)}</div>
+        <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 14.5, color: T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</div>
+        <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: T.inkSoft }}>{window.normCat(item.cat)}</div>
       </div>
       <div style={{
         width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
@@ -151,7 +151,7 @@ function CreateGroupSheet({ app }) {
 
   return (
     <window.Sheet open title="Create a group" onClose={app.closeModal}>
-      <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: T.inkSoft, marginBottom: 16, textWrap: 'pretty' }}>
+      <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: T.inkSoft, marginBottom: 16, textWrap: 'pretty' }}>
         Groups help you organise your shelf — like “Neighbours”, “Family”, or “Climbing crew”. You can invite people with a link or by email.
       </div>
       <window.Field label="Group name">
@@ -160,7 +160,7 @@ function CreateGroupSheet({ app }) {
 
       <window.Field label={mine.length ? `Add your items${sel.length ? ` · ${sel.length} selected` : ''}` : 'Add your items'}>
         {mine.length === 0 ? (
-          <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, color: T.inkFaint, padding: '12px 14px', background: T.surfaceAlt, borderRadius: 13, border: `1px dashed ${T.line}` }}>
+          <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 13.5, color: T.inkFaint, padding: '12px 14px', background: T.surfaceAlt, borderRadius: 13, border: `1px dashed ${T.line}` }}>
             You haven’t added any items yet. Create the group, then add things from the Lend tab.
           </div>
         ) : (
@@ -186,12 +186,12 @@ function JoinGroupSheet({ app }) {
   const ready = code.trim().length >= 4;
   return (
     <window.Sheet open title="Join a group" onClose={app.closeModal}>
-      <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: T.inkSoft, marginBottom: 16, textWrap: 'pretty' }}>
+      <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: T.inkSoft, marginBottom: 16, textWrap: 'pretty' }}>
         Have an invite link? Just open it and you’ll join automatically. Otherwise, type the group’s code below.
       </div>
       <window.Field label="Group code">
         <input autoFocus value={code} onChange={e => setCode(e.target.value.toUpperCase())} placeholder="e.g. K7P2QR" maxLength={8}
-          style={{ ...window.inputStyle(T), letterSpacing: 3, fontFamily: 'DM Mono, monospace', textTransform: 'uppercase' }} />
+          style={{ ...window.inputStyle(T), letterSpacing: 3, fontFamily: 'Inter, sans-serif', textTransform: 'uppercase' }} />
       </window.Field>
       <window.Btn variant="primary" full size="lg" disabled={!ready} onClick={() => app.joinByCode(code)}>
         <window.Icon name="check" size={18} /> Join group
@@ -227,11 +227,11 @@ function ManageGroupSheet({ app }) {
   return (
     <window.Sheet open title={g.name} onClose={app.closeModal}>
       {/* Invite link */}
-      <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 13.5, color: T.ink, marginBottom: 8 }}>Invite link</div>
+      <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 13.5, color: T.ink, marginBottom: 8 }}>Invite link</div>
       <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
         <div style={{
           flex: 1, minWidth: 0, background: T.surfaceAlt, border: `1px solid ${T.line}`, borderRadius: 12,
-          padding: '11px 13px', fontFamily: 'DM Mono, monospace', fontSize: 12.5, color: T.inkSoft,
+          padding: '11px 13px', fontFamily: 'Inter, sans-serif', fontSize: 12.5, color: T.inkSoft,
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}>{link}</div>
         <window.Btn variant="soft" onClick={copy}><window.Icon name="copy" size={17} /> Copy</window.Btn>
@@ -239,14 +239,14 @@ function ManageGroupSheet({ app }) {
 
       {/* Code */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-        <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, color: T.inkSoft }}>Or share the code</span>
-        <span style={{ fontFamily: 'DM Mono, monospace', fontSize: 15, fontWeight: 500, letterSpacing: 2, color: T.accentDeep, background: T.accentSoft, padding: '4px 10px', borderRadius: 8 }}>{g.code}</span>
+        <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 13.5, color: T.inkSoft }}>Or share the code</span>
+        <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 15, fontWeight: 500, letterSpacing: 2, color: T.accentDeep, background: T.accentSoft, padding: '4px 10px', borderRadius: 8 }}>{g.code}</span>
       </div>
 
       {/* Email invites (owner only) */}
       {isOwner && (
         <div style={{ marginBottom: 20 }}>
-          <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 13.5, color: T.ink, marginBottom: 8 }}>Invite by email</div>
+          <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 13.5, color: T.ink, marginBottom: 8 }}>Invite by email</div>
           <div style={{ display: 'flex', gap: 8, marginBottom: invited.length ? 12 : 0 }}>
             <input value={email} onChange={e => setEmail(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') addEmail(); }}
               placeholder="name@email.com" inputMode="email" style={{ ...window.inputStyle(T), flex: 1 }} />
@@ -255,8 +255,8 @@ function ManageGroupSheet({ app }) {
           {invited.map(em => (
             <div key={em} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 4px' }}>
               <window.Icon name="mail" size={16} color={T.inkFaint} />
-              <span style={{ flex: 1, minWidth: 0, fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: T.inkSoft, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{em}</span>
-              <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12, color: T.inkFaint }}>pending</span>
+              <span style={{ flex: 1, minWidth: 0, fontFamily: 'Inter, sans-serif', fontSize: 14, color: T.inkSoft, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{em}</span>
+              <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: T.inkFaint }}>pending</span>
               <button onClick={() => app.removeInvite(g.id, em)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: T.inkFaint, display: 'flex', padding: 4 }}>
                 <window.Icon name="trash" size={16} />
               </button>
@@ -272,7 +272,7 @@ function ManageGroupSheet({ app }) {
         const inCount = mine.filter(it => (it.groups || []).includes(g.id)).length;
         return (
           <div style={{ marginBottom: 20 }}>
-            <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 13.5, color: T.ink, marginBottom: 9 }}>
+            <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 13.5, color: T.ink, marginBottom: 9 }}>
               Your items in this group{inCount ? ` · ${inCount}` : ''}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -287,7 +287,7 @@ function ManageGroupSheet({ app }) {
       })()}
 
       {/* Members */}
-      <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 13.5, color: T.ink, marginBottom: 10 }}>
+      <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 13.5, color: T.ink, marginBottom: 10 }}>
         Members · {members.length}
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 4 }}>
@@ -297,11 +297,11 @@ function ManageGroupSheet({ app }) {
             <div key={id} style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
               <window.Avatar user={id} size={34} />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 14.5, color: T.ink }}>
+                <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 14.5, color: T.ink }}>
                   {id === app.uid ? 'You' : (m ? m.full || m.name : 'Member')}
                 </div>
               </div>
-              {id === g.ownerUid && <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12, fontWeight: 600, color: T.accentDeep, background: T.accentSoft, padding: '3px 9px', borderRadius: 999 }}>Admin</span>}
+              {id === g.ownerUid && <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 600, color: T.accentDeep, background: T.accentSoft, padding: '3px 9px', borderRadius: 999 }}>Admin</span>}
             </div>
           );
         })}
