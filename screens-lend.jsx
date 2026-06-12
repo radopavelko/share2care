@@ -19,9 +19,9 @@ function LendScreen({ app }) {
   return (
     <div style={{ paddingBottom: 130 }}>
       <div style={{ padding: '54px 20px 4px' }}>
-        <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 12, letterSpacing: 0.6, color: T.accent, textTransform: 'uppercase' }}>Lend to your circle</div>
-        <div style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 700, fontSize: 30, color: T.ink, letterSpacing: -0.5, marginTop: 3 }}>Your things</div>
-        <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14.5, color: T.inkSoft, marginTop: 6, textWrap: 'pretty' }}>Add things you own, then share them with your groups so people can ask to borrow them.</div>
+        <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, letterSpacing: 0.6, color: T.accent, textTransform: 'uppercase' }}>Lend to your circle</div>
+        <div style={{ fontFamily: 'Archivo Black, sans-serif', fontSize: 23, color: T.ink, letterSpacing: -0.5, marginTop: 3, textTransform: 'uppercase' }}>Your things</div>
+        <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 14.5, color: T.inkSoft, marginTop: 6, textWrap: 'pretty' }}>Add things you own, then share them with your groups so people can ask to borrow them.</div>
       </div>
 
       <div style={{ padding: '16px 20px 0' }}>
@@ -30,9 +30,9 @@ function LendScreen({ app }) {
         </window.Btn>
 
         <div>
-          <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 12, letterSpacing: 0.5, textTransform: 'uppercase', color: T.inkSoft, marginBottom: 10 }}>On your shelf · {mine.length}</div>
+          <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, letterSpacing: 0.5, textTransform: 'uppercase', color: T.inkSoft, marginBottom: 10 }}>On your shelf · {mine.length}</div>
           {mine.length === 0 ? (
-            <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: T.inkFaint, padding: '14px 16px', background: T.surfaceAlt, borderRadius: 14, border: `1px dashed ${T.line}` }}>Nothing here yet — add something above.</div>
+            <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: T.inkFaint, padding: '14px 16px', background: T.surfaceAlt, borderRadius: 14, border: `1px dashed ${T.line}` }}>Nothing here yet — add something above.</div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {mine.map(it => (
@@ -40,8 +40,8 @@ function LendScreen({ app }) {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{ width: 50, flexShrink: 0 }}><window.ItemThumb item={it} height={50} radius={11} /></div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 15, color: T.ink }}>{it.name}</div>
-                      <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkSoft, marginTop: 1 }}>
+                      <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 15, color: T.ink }}>{it.name}</div>
+                      <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, color: T.inkSoft, marginTop: 1 }}>
                         {window.normCat(it.cat)}{groupNames(app, it.groups) ? ' · ' + groupNames(app, it.groups) : ''}
                       </div>
                     </div>
@@ -62,25 +62,46 @@ function LendScreen({ app }) {
 function CategoryPicker({ value, onChange }) {
   const T = window.THEME;
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-      {window.CATEGORIES.map(c => {
-        const meta = window.CAT_META[c];
-        const accent = (meta && meta.chip) || T.accent;
-        const on = value === c;
-        return (
-          <button key={c} onClick={() => onChange(c)} style={{
-            display: 'inline-flex', alignItems: 'center', gap: 6,
-            padding: '9px 13px', borderRadius: 999, cursor: 'pointer',
-            fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, fontWeight: 600,
-            border: `1.5px solid ${on ? accent : T.line}`,
-            background: on ? accent : T.surface, color: on ? '#fff' : T.inkSoft,
-            transition: 'all .14s ease',
-          }}>
-            {meta && meta.icon && <window.Icon name={meta.icon} size={14} color={on ? '#fff' : accent} />}
-            {c}
-          </button>
-        );
-      })}
+    <div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        {window.LEND_CATEGORIES.map(c => {
+          const meta = window.CAT_META[c];
+          const on = value === c;
+          return (
+            <button key={c} onClick={() => onChange(c)} style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              padding: '9px 13px', borderRadius: 999, cursor: 'pointer',
+              fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: 600,
+              border: `1.5px solid ${on ? T.accent : T.line}`,
+              background: on ? T.accent : T.surface, color: on ? '#fff' : T.inkSoft,
+              transition: 'all .14s ease',
+            }}>
+              {meta && meta.icon && <window.Icon name={meta.icon} size={14} color={on ? '#fff' : T.accent} />}
+              {c}
+            </button>
+          );
+        })}
+      </div>
+      {/* Give Away / Sell sit below the lending categories, in their own colours */}
+      <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+        {window.MARKET_CATEGORIES.map(c => {
+          const meta = window.CAT_META[c];
+          const on = value === c;
+          return (
+            <button key={c} onClick={() => onChange(c)} style={{
+              flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+              padding: '11px 12px', borderRadius: 13, cursor: 'pointer',
+              fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: 700,
+              border: `1.5px solid ${meta.chip}`,
+              background: on ? meta.chip : T.surface, color: on ? meta.chipFg : meta.chip,
+              transition: 'all .14s ease',
+            }}>
+              <window.Icon name={meta.icon} size={15} color={on ? meta.chipFg : meta.chip} />
+              {c}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -132,12 +153,12 @@ function NewItemSheet({ app }) {
         {preview ? (
           <div style={{ position: 'relative' }}>
             <window.ItemThumb item={previewItem} height={150} radius={16} />
-            <div style={{ position: 'absolute', bottom: 10, right: 10, background: 'rgba(255,255,255,0.92)', borderRadius: 10, padding: '6px 11px', fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, fontWeight: 600, color: T.inkSoft }}>Change photo</div>
+            <div style={{ position: 'absolute', bottom: 10, right: 10, background: 'rgba(255,255,255,0.92)', borderRadius: 10, padding: '6px 11px', fontFamily: 'Inter, sans-serif', fontSize: 12.5, fontWeight: 600, color: T.inkSoft }}>Change photo</div>
           </div>
         ) : (
           <div style={{ height: 120, borderRadius: 16, border: `1.5px dashed ${T.line}`, background: T.surfaceAlt, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: T.inkFaint }}>
             <window.Icon name="camera" size={26} />
-            <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14, fontWeight: 500 }}>Add a photo (optional)</span>
+            <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, fontWeight: 500 }}>Add a photo (optional)</span>
           </div>
         )}
       </button>
@@ -156,7 +177,7 @@ function NewItemSheet({ app }) {
         </window.Field>
       )}
       {cat === 'Give Away' && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: -6, marginBottom: 18, fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, fontWeight: 600, color: window.CAT_META['Give Away'].chip }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: -6, marginBottom: 18, fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: 600, color: window.CAT_META['Give Away'].chip }}>
           <window.Icon name="gift" size={15} color={window.CAT_META['Give Away'].chip} /> Will be shown as Free
         </div>
       )}
@@ -173,7 +194,7 @@ function NewItemSheet({ app }) {
               return (
                 <button key={g.id} onClick={() => toggleG(g.id)} style={{
                   display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 13px', borderRadius: 999, cursor: 'pointer',
-                  fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, fontWeight: 600,
+                  fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: 600,
                   border: `1.5px solid ${on ? T.accent : T.line}`,
                   background: on ? T.accent : T.surface, color: on ? '#fff' : T.inkSoft, transition: 'all .14s ease',
                 }}>
@@ -182,7 +203,7 @@ function NewItemSheet({ app }) {
               );
             })}
           </div>
-          <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkFaint, marginTop: 8 }}>
+          <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, color: T.inkFaint, marginTop: 8 }}>
             {gsel.length ? 'Visible to those groups.' : 'Not in a group — only you will see it.'}
           </div>
         </window.Field>
@@ -242,7 +263,7 @@ function EditItemForm({ app, item }) {
       <button onClick={() => fileRef.current && fileRef.current.click()} style={{ width: '100%', border: 'none', background: 'none', padding: 0, cursor: 'pointer', marginBottom: 18 }}>
         <div style={{ position: 'relative' }}>
           <window.ItemThumb item={previewItem} height={150} radius={16} />
-          <div style={{ position: 'absolute', bottom: 10, right: 10, display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.92)', borderRadius: 10, padding: '6px 11px', fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, fontWeight: 600, color: T.inkSoft }}>
+          <div style={{ position: 'absolute', bottom: 10, right: 10, display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.92)', borderRadius: 10, padding: '6px 11px', fontFamily: 'Inter, sans-serif', fontSize: 12.5, fontWeight: 600, color: T.inkSoft }}>
             <window.Icon name="camera" size={14} /> {previewItem.photoURL ? 'Change photo' : 'Add photo'}
           </div>
         </div>
@@ -262,7 +283,7 @@ function EditItemForm({ app, item }) {
         </window.Field>
       )}
       {cat === 'Give Away' && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: -6, marginBottom: 18, fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, fontWeight: 600, color: window.CAT_META['Give Away'].chip }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: -6, marginBottom: 18, fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: 600, color: window.CAT_META['Give Away'].chip }}>
           <window.Icon name="gift" size={15} color={window.CAT_META['Give Away'].chip} /> Will be shown as Free
         </div>
       )}

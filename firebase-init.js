@@ -34,10 +34,10 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 const provider = new GoogleAuthProvider();
 
-// Deterministic warm colour from a uid, so each member gets a stable avatar tint.
+// Deterministic brand colour from a uid, so each member gets a stable avatar tint.
 const AVATAR_COLORS = [
-  "#C2693F", "#7C9A6B", "#B5728A", "#6E84A3", "#B7913F",
-  "#8A6FA8", "#C77F55", "#5E8C7D", "#A86A6A", "#9A7BB0", "#5F8AA0",
+  "#E8312B", "#111111", "#B5211C", "#3B6D11", "#B07A2E",
+  "#444444", "#6B6B6B", "#8C2E2A", "#2E4E1E", "#7A5A23",
 ];
 function colorFor(uid) {
   let h = 0;
@@ -62,7 +62,8 @@ async function ensureUserDoc(user) {
     // keep name/photo in sync with Google, but don't clobber createdAt
     await setDoc(uref, base, { merge: true });
   }
-  return { id: user.uid, you: true, ...base };
+  // include existing doc fields (e.g. the onboarded flag) under the fresh base
+  return { id: user.uid, you: true, ...(snap.exists() ? snap.data() : {}), ...base };
 }
 
 // Short, human-friendly join code (no ambiguous chars like O/0, I/1).
@@ -109,6 +110,8 @@ window.S2 = {
   onAuth: (cb) => onAuthStateChanged(auth, cb),
   ensureUserDoc,
   currentUid: () => (auth.currentUser ? auth.currentUser.uid : null),
+  // first-run intro pages: remember (per user) that they've been seen
+  markOnboarded: (uid) => updateDoc(doc(db, "users", uid), { onboarded: true }),
 
   // live subscriptions — return an unsubscribe function
   subItems: (cb) => onSnapshot(

@@ -1,4 +1,5 @@
-// app.jsx — Share2 app shell: auth gate, Firestore data layer, actions, tabs.
+// app.jsx — ShareKeep.Online app shell: auth gate, first-run onboarding,
+// Firestore data layer, actions, tabs.
 
 const { useState, useEffect, useRef, useMemo } = React;
 
@@ -17,39 +18,39 @@ function SignIn({ onSignIn, error }) {
       alignItems: 'center', justifyContent: 'center', textAlign: 'center',
       padding: '0 32px', background: T.bg,
     }}>
+      <div style={{ marginBottom: 24 }}><window.BrandMark size={76} /></div>
+      <window.Wordmark size={23} />
       <div style={{
-        width: 76, height: 76, borderRadius: 22, background: T.accent, color: '#fff',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 22,
-        boxShadow: '0 8px 24px rgba(194,105,63,0.34)',
+        fontFamily: 'Archivo Black, sans-serif', fontSize: 26, color: T.ink, letterSpacing: -0.5,
+        lineHeight: 1.1, textTransform: 'uppercase', marginTop: 22,
       }}>
-        <window.Icon name="box" size={38} color="#fff" />
+        Borrow. Lend.<br /><span style={{ color: T.accent }}>Sell it on.</span><br />Buy less.
       </div>
-      <div style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 700, fontSize: 34, color: T.ink, letterSpacing: -0.6 }}>Share2</div>
-      <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 16, color: T.inkSoft, marginTop: 8, maxWidth: 280, lineHeight: 1.5, textWrap: 'pretty' }}>
-        Borrow and lend everyday things with people you trust.
+      <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 15, color: T.inkSoft, marginTop: 12, maxWidth: 270, lineHeight: 1.55, textWrap: 'pretty' }}>
+        One shelf for your trusted circle. Their things and yours — moving, not gathering dust.
       </div>
 
-      <div style={{ height: 34 }} />
+      <div style={{ height: 30 }} />
 
       <button onClick={go} disabled={busy} style={{
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 11,
-        background: '#fff', color: '#3c3c3c', border: `1.5px solid ${T.line}`,
-        borderRadius: 14, padding: '14px 22px', cursor: busy ? 'default' : 'pointer',
-        fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 16,
-        boxShadow: T.shadowSm, opacity: busy ? 0.6 : 1, WebkitTapHighlightColor: 'transparent',
+        background: T.btnContrast, color: T.btnContrastFg, border: 'none',
+        borderRadius: 14, padding: '15px 24px', cursor: busy ? 'default' : 'pointer',
+        fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 16,
+        opacity: busy ? 0.6 : 1, WebkitTapHighlightColor: 'transparent',
       }}>
         <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.9 2.4 30.4 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.2C12.4 13.7 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.5c-.5 2.9-2.2 5.3-4.7 7l7.2 5.6c4.2-3.9 6.6-9.6 6.6-17.1z"/><path fill="#FBBC05" d="M10.5 28.6c-.5-1.4-.7-2.9-.7-4.6s.3-3.2.7-4.6l-7.9-6.2C1 16.5 0 20.1 0 24s1 7.5 2.6 10.8l7.9-6.2z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.2-5.6c-2 1.4-4.6 2.2-8.7 2.2-6.3 0-11.6-4.2-13.5-9.9l-7.9 6.2C6.5 42.6 14.6 48 24 48z"/></svg>
         {busy ? 'Opening…' : 'Continue with Google'}
       </button>
 
       {error && (
-        <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, color: T.over, marginTop: 18, maxWidth: 300, lineHeight: 1.5 }}>
+        <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 13.5, color: T.over, marginTop: 18, maxWidth: 300, lineHeight: 1.5 }}>
           {error}
         </div>
       )}
 
-      <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkFaint, marginTop: 26, maxWidth: 280, lineHeight: 1.5 }}>
-        Create or join groups with people you trust — you only see each other's shared things.
+      <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, color: T.inkFaint, marginTop: 26, maxWidth: 280, lineHeight: 1.5 }}>
+        Groups only — no strangers. You see your circles' things, nobody else's.
       </div>
     </div>
   );
@@ -66,6 +67,7 @@ function App({ me }) {
     try { return localStorage.getItem('s2.group.' + me.id) || null; } catch (e) { return null; }
   });
   const [tab, setTab] = useState('browse');
+  const [themeMode, setThemeMode] = useState(window.THEME.mode);
   const [detailId, setDetailId] = useState(null);
   const [modal, setModal] = useState(null);
   const [modalArg, setModalArg] = useState(null);
@@ -153,6 +155,14 @@ function App({ me }) {
     groups: myGroups, group, groupId, allGroups: groups,
 
     goTab: (x) => { setDetailId(null); setModal(null); setModalArg(null); setTab(x); },
+
+    themeMode,
+    toggleTheme: () => {
+      const next = themeMode === 'light' ? 'dark' : 'light';
+      window.applyThemeMode(next);
+      try { localStorage.setItem('sk.mode', next); } catch (e) { /* ignore */ }
+      setThemeMode(next);
+    },
     openItem: (id) => setDetailId(id),
     closeItem: () => setDetailId(null),
     openModal: (m, arg = null) => { setModal(m); setModalArg(arg); },
@@ -292,7 +302,7 @@ function App({ me }) {
     notifyWhenFree: (it) => toast(`We’ll let you know when ${it.name} is free`, 'bell'),
 
     signOut: () => window.S2.signOut(),
-  }), [items, requests, members, modal, modalArg, groups, groupId, me, uid]);
+  }), [items, requests, members, modal, modalArg, groups, groupId, me, uid, themeMode]);
 
   const incomingCount = requests.filter(r => r.toUid === uid && r.status === 'pending').length;
   const detailItem = detailId ? items.find(i => i.id === detailId) : null;
@@ -343,12 +353,12 @@ function App({ me }) {
                     <span style={{
                       position: 'absolute', top: -4, right: -7, minWidth: 16, height: 16, padding: '0 4px',
                       borderRadius: 9, background: T.accent, color: '#fff', fontSize: 10.5, fontWeight: 700,
-                      fontFamily: 'DM Sans, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center',
                       boxShadow: `0 0 0 2px ${T.surface}`,
                     }}>{tb.badge}</span>
                   )}
                 </div>
-                <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 11, fontWeight: active ? 700 : 500, color: active ? T.accent : T.inkFaint }}>{tb.label}</span>
+                <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: active ? 700 : 500, color: active ? T.accent : T.inkFaint }}>{tb.label}</span>
               </button>
             );
           })}
@@ -415,11 +425,19 @@ function Root() {
   if (!ready || authUser === undefined) {
     content = (
       <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: T.bg }}>
-        <div className="pulse-dot" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 700, fontSize: 24, color: T.accent }}>Share2</div>
+        <div className="pulse-dot" style={{ fontFamily: 'Archivo Black, sans-serif', fontSize: 21, color: T.ink, letterSpacing: -0.5 }}>SHAREKEEP<span style={{ color: T.accent }}>.ONLINE</span></div>
       </div>
     );
   } else if (!authUser || !me) {
     content = <SignIn onSignIn={signIn} error={error} />;
+  } else if (!me.onboarded) {
+    // first sign-in: three intro pages, then (or on Skip) straight to the app
+    content = (
+      <window.Onboarding onDone={() => {
+        window.S2.markOnboarded(me.id).catch(console.error);
+        setMe({ ...me, onboarded: true });
+      }} />
+    );
   } else {
     content = <App me={me} />;
   }

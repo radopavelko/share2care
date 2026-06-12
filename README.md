@@ -1,7 +1,7 @@
-# Share2
+# ShareKeep.Online
 
-Borrow and lend everyday things with people you trust. One shared circle: everyone
-who signs in sees the same shelf and can ask to borrow each other's items.
+Share it out. Keep track. Buy less. Borrow, lend, sell, or give away everyday
+things within trusted groups — each group only sees what its members share.
 
 - **Frontend:** static HTML/CSS/JS (React via CDN, compiled in-browser by Babel — no build step)
 - **Auth:** Firebase Authentication (Google sign-in)

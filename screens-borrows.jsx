@@ -4,8 +4,8 @@ function SectionLabel({ children, count }) {
   const T = window.THEME;
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 4px 10px' }}>
-      <span style={{ fontFamily: 'DM Mono, monospace', fontSize: 12, letterSpacing: 0.5, textTransform: 'uppercase', color: T.inkSoft, whiteSpace: 'nowrap' }}>{children}</span>
-      {count != null && <span style={{ fontFamily: 'DM Mono, monospace', fontSize: 11.5, color: T.inkFaint }}>{count}</span>}
+      <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, letterSpacing: 0.5, textTransform: 'uppercase', color: T.inkSoft, whiteSpace: 'nowrap' }}>{children}</span>
+      {count != null && <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 11.5, color: T.inkFaint }}>{count}</span>}
     </div>
   );
 }
@@ -13,7 +13,7 @@ function SectionLabel({ children, count }) {
 function EmptyHint({ text }) {
   const T = window.THEME;
   return (
-    <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: T.inkFaint, padding: '14px 16px', background: T.surfaceAlt, borderRadius: 14, border: `1px dashed ${T.line}`, textWrap: 'pretty' }}>{text}</div>
+    <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: T.inkFaint, padding: '14px 16px', background: T.surfaceAlt, borderRadius: 14, border: `1px dashed ${T.line}`, textWrap: 'pretty' }}>{text}</div>
   );
 }
 
@@ -31,8 +31,8 @@ function BorrowsScreen({ app }) {
   return (
     <div style={{ paddingBottom: 120 }}>
       <div style={{ padding: '54px 20px 14px' }}>
-        <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 12, letterSpacing: 0.6, color: T.accent, textTransform: 'uppercase' }}>Your circle</div>
-        <div style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 700, fontSize: 30, color: T.ink, letterSpacing: -0.5, marginTop: 3 }}>My loans</div>
+        <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, letterSpacing: 0.6, color: T.accent, textTransform: 'uppercase' }}>Your circle</div>
+        <div style={{ fontFamily: 'Archivo Black, sans-serif', fontSize: 23, color: T.ink, letterSpacing: -0.5, marginTop: 3, textTransform: 'uppercase' }}>My loans</div>
       </div>
 
       <div style={{ padding: '0 20px' }}>
@@ -51,20 +51,20 @@ function BorrowsScreen({ app }) {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 3 }}>
                           <window.Avatar user={from} size={20} />
-                          <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, color: T.inkSoft }}><b style={{ color: T.ink }}>{from.name}</b> {market ? (market.kind === 'sell' ? 'wants to buy' : 'will take') : 'wants'}</span>
+                          <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 13.5, color: T.inkSoft }}><b style={{ color: T.ink }}>{from.name}</b> {market ? (market.kind === 'sell' ? 'wants to buy' : 'will take') : 'wants'}</span>
                         </div>
-                        <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 15.5, color: T.ink }}>{it.name}</div>
+                        <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 15.5, color: T.ink }}>{it.name}</div>
                         {market ? (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 2 }}>
                             <window.Icon name={market.icon} size={13} color={market.color} />
-                            <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, fontWeight: 700, color: market.color }}>{market.label}</span>
+                            <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 700, color: market.color }}>{market.label}</span>
                           </div>
                         ) : (
-                          <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: T.inkSoft, marginTop: 2 }}>until {window.fmtDate(r.due)}</div>
+                          <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: T.inkSoft, marginTop: 2 }}>until {window.fmtDate(r.due)}</div>
                         )}
                       </div>
                     </div>
-                    {r.note && <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: T.inkSoft, fontStyle: 'italic', background: T.surfaceAlt, borderRadius: 12, padding: '9px 12px', margin: '11px 0 0', textWrap: 'pretty' }}>“{r.note}”</div>}
+                    {r.note && <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: T.inkSoft, fontStyle: 'italic', background: T.surfaceAlt, borderRadius: 12, padding: '9px 12px', margin: '11px 0 0', textWrap: 'pretty' }}>“{r.note}”</div>}
                     <div style={{ display: 'flex', gap: 9, marginTop: 12 }}>
                       <window.Btn variant="good" size="sm" full onClick={() => app.respondRequest(r.id, true)}>
                         <window.Icon name="check" size={17} /> {market ? (market.kind === 'sell' ? 'Sell it' : 'Give it') : 'Lend it'}
@@ -93,12 +93,12 @@ function BorrowsScreen({ app }) {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       <div style={{ width: 52, flexShrink: 0 }} onClick={() => app.openItem(it.id)}><window.ItemThumb item={it} height={52} radius={11} /></div>
                       <div style={{ flex: 1, minWidth: 0 }} onClick={() => app.openItem(it.id)}>
-                        <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 15, color: T.ink }}>{it.name}</div>
+                        <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 15, color: T.ink }}>{it.name}</div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
                           <window.Avatar user={it.ownerUid} size={16} />
-                          <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkSoft }}>{owner.name}</span>
+                          <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, color: T.inkSoft }}>{owner.name}</span>
                           <span style={{ width: 3, height: 3, borderRadius: 9, background: T.inkFaint }} />
-                          <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, fontWeight: 600, color: toneColor }}>{r.label}</span>
+                          <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, fontWeight: 600, color: toneColor }}>{r.label}</span>
                         </div>
                       </div>
                       <window.Btn variant="ghost" size="sm" onClick={() => app.returnItem(it.id)}>Return</window.Btn>
@@ -114,13 +114,13 @@ function BorrowsScreen({ app }) {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       <div style={{ width: 52, flexShrink: 0 }}><window.ItemThumb item={it} height={52} radius={11} /></div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 15, color: T.ink }}>{it.name}</div>
-                        <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.accentDeep, marginTop: 3, display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 15, color: T.ink }}>{it.name}</div>
+                        <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, color: T.accentDeep, marginTop: 3, display: 'flex', alignItems: 'center', gap: 6 }}>
                           <span className="pulse-dot" style={{ width: 7, height: 7, borderRadius: 9, background: T.accent, display: 'inline-block' }} />
                           Waiting for {owner.name}
                         </div>
                       </div>
-                      <span style={{ fontFamily: 'DM Mono, monospace', fontSize: 11.5, color: T.inkFaint }}>pending</span>
+                      <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 11.5, color: T.inkFaint }}>pending</span>
                     </div>
                   </window.Card>
                 );
@@ -143,12 +143,12 @@ function BorrowsScreen({ app }) {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       <div style={{ width: 52, flexShrink: 0 }}><window.ItemThumb item={it} height={52} radius={11} /></div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 15, color: T.ink }}>{it.name}</div>
+                        <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 15, color: T.ink }}>{it.name}</div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
                           <window.Avatar user={it.borrowerUid} size={16} />
-                          <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkSoft }}>with {b.name}</span>
+                          <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, color: T.inkSoft }}>with {b.name}</span>
                           <span style={{ width: 3, height: 3, borderRadius: 9, background: T.inkFaint }} />
-                          <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, fontWeight: 600, color: toneColor }}>{r.label}</span>
+                          <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, fontWeight: 600, color: toneColor }}>{r.label}</span>
                         </div>
                       </div>
                       <window.Btn variant="soft" size="sm" onClick={() => app.markReturned(it.id)}>Got it back</window.Btn>
@@ -175,8 +175,8 @@ function ProfileScreen({ app }) {
 
   const Stat = ({ n, label }) => (
     <div style={{ flex: 1, textAlign: 'center' }}>
-      <div style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 700, fontSize: 24, color: T.ink }}>{n}</div>
-      <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkSoft, marginTop: 1 }}>{label}</div>
+      <div style={{ fontFamily: 'Archivo Black, sans-serif', fontWeight: 700, fontSize: 24, color: T.ink }}>{n}</div>
+      <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, color: T.inkSoft, marginTop: 1 }}>{label}</div>
     </div>
   );
 
@@ -184,9 +184,9 @@ function ProfileScreen({ app }) {
     <div style={{ paddingBottom: 120 }}>
       <div style={{ padding: '60px 20px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
         <window.Avatar user={me} size={84} />
-        <div style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 700, fontSize: 25, color: T.ink, marginTop: 14, letterSpacing: -0.3 }}>{me.full}</div>
+        <div style={{ fontFamily: 'Archivo Black, sans-serif', fontSize: 20, color: T.ink, marginTop: 14, letterSpacing: -0.3, textTransform: 'uppercase' }}>{me.full}</div>
         {me.email && (
-          <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: T.inkSoft, marginTop: 4 }}>{me.email}</div>
+          <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: T.inkSoft, marginTop: 4 }}>{me.email}</div>
         )}
       </div>
 
@@ -214,8 +214,8 @@ function ProfileScreen({ app }) {
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}><window.Icon name="users" size={19} color={T.accentDeep} /></div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 15, color: T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{g.name}</div>
-                    <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkSoft, marginTop: 1 }}>
+                    <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 15, color: T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{g.name}</div>
+                    <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, color: T.inkSoft, marginTop: 1 }}>
                       {(g.memberUids || []).length} {(g.memberUids || []).length === 1 ? 'member' : 'members'}{g.ownerUid === uid ? ' · you’re the admin' : ''}
                     </div>
                   </div>
@@ -228,7 +228,7 @@ function ProfileScreen({ app }) {
         <button onClick={() => app.openModal('createGroup')} style={{
           width: '100%', marginTop: 12, padding: '13px', borderRadius: 14, cursor: 'pointer',
           border: `1.5px dashed ${T.line}`, background: 'transparent', color: T.accentDeep,
-          fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 14.5,
+          fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 14.5,
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
         }}><window.Icon name="users" size={18} /> Create a group</button>
       </div>
@@ -241,8 +241,8 @@ function ProfileScreen({ app }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{ width: 48, flexShrink: 0 }}><window.ItemThumb item={it} height={48} radius={10} /></div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 15, color: T.ink }}>{it.name}</div>
-                  <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: T.inkSoft, marginTop: 2 }}>{window.normCat(it.cat)}</div>
+                  <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 15, color: T.ink }}>{it.name}</div>
+                  <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, color: T.inkSoft, marginTop: 2 }}>{window.normCat(it.cat)}</div>
                 </div>
                 <window.StatusBadge status={it.status} due={it.due} small />
               </div>
@@ -252,7 +252,7 @@ function ProfileScreen({ app }) {
         <button onClick={() => app.goTab('lend')} style={{
           width: '100%', marginTop: 12, padding: '13px', borderRadius: 14, cursor: 'pointer',
           border: `1.5px dashed ${T.line}`, background: 'transparent', color: T.accentDeep,
-          fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 14.5,
+          fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 14.5,
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
         }}><window.Icon name="plus" size={18} /> Lend something new</button>
 

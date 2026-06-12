@@ -1,24 +1,103 @@
-// theme.jsx — design tokens + shared presentational components for Share2
+// theme.jsx — ShareKeep.Online design tokens (white / black / signal red, in a
+// light and a dark flavour) + shared presentational components.
+//
+// THEME is a single mutable object: applyThemeMode() copies the chosen palette
+// into it (and re-tints CAT_META), then the app re-renders so every component
+// picks up the new values.
 
-const THEME = {
-  bg:        '#F3EDE5',
-  surface:   '#FFFFFF',
-  surfaceAlt:'#FBF6EF',
-  ink:       '#2C2722',
-  inkSoft:   '#6F665C',
-  inkFaint:  '#A89E92',
-  line:      '#E8E0D5',
-  lineSoft:  '#F0EAE1',
-  accent:    '#C2693F',
-  accentDeep:'#A8542F',
-  accentSoft:'#F3E1D5',
-  good:      '#6E8B66',
-  goodSoft:  '#E4EADD',
-  warn:      '#B07A2E',
-  over:      '#B0503B',
-  shadow:    '0 1px 2px rgba(60,45,30,0.05), 0 8px 22px rgba(60,45,30,0.07)',
-  shadowSm:  '0 1px 2px rgba(60,45,30,0.06)',
+const THEMES = {
+  light: {
+    mode:      'light',
+    bg:        '#FAFAF8',
+    surface:   '#FFFFFF',
+    surfaceAlt:'#F3F2EF',
+    ink:       '#111111',
+    inkSoft:   '#6B6B6B',
+    inkFaint:  '#9A9894',
+    line:      '#E2E0DC',
+    lineSoft:  '#ECEAE6',
+    accent:    '#E8312B',
+    accentDeep:'#B5211C',
+    accentSoft:'#FBE9E8',
+    good:      '#3B6D11',
+    goodSoft:  '#E9F2E6',
+    warn:      '#B07A2E',
+    over:      '#B5211C',
+    neutralSoft:'#EAE9E6',
+    dangerSoft:'#FDF1F0',
+    dangerLine:'#F3C9C6',
+    disabledBg:'#D8D6D2',
+    toastBg:   '#111111',
+    tagBg:     'rgba(255,255,255,0.82)',
+    thumbDot:  'rgba(255,255,255,0.6)',
+    thumbShape:'rgba(255,255,255,0.55)',
+    btnContrast:'#111111',
+    btnContrastFg:'#FFFFFF',
+    bodyBg:    '#EBEAE7',
+    shadow:    '0 1px 2px rgba(0,0,0,0.04), 0 8px 22px rgba(0,0,0,0.06)',
+    shadowSm:  '0 1px 2px rgba(0,0,0,0.04)',
+  },
+  dark: {
+    mode:      'dark',
+    bg:        '#0E0E0E',
+    surface:   '#1A1A1A',
+    surfaceAlt:'#232323',
+    ink:       '#FFFFFF',
+    inkSoft:   '#B9B9B9',
+    inkFaint:  '#7C7C7C',
+    line:      '#2E2E2E',
+    lineSoft:  '#262626',
+    accent:    '#E8312B',
+    accentDeep:'#F08D89',
+    accentSoft:'#2A1413',
+    good:      '#7FBF7A',
+    goodSoft:  '#1F2B1F',
+    warn:      '#D9A05B',
+    over:      '#F08D89',
+    neutralSoft:'#262626',
+    dangerSoft:'#2A1413',
+    dangerLine:'#4A201E',
+    disabledBg:'#3A3A3A',
+    toastBg:   '#2A2A2A',
+    tagBg:     'rgba(18,18,18,0.85)',
+    thumbDot:  'rgba(255,255,255,0.05)',
+    thumbShape:'rgba(255,255,255,0.06)',
+    btnContrast:'#FFFFFF',
+    btnContrastFg:'#111111',
+    bodyBg:    '#0A0A0A',
+    shadow:    '0 1px 2px rgba(0,0,0,0.4), 0 8px 22px rgba(0,0,0,0.5)',
+    shadowSm:  '0 1px 2px rgba(0,0,0,0.4)',
+  },
 };
+
+// Per-mode category tile tints and the Give Away / Sell button colours
+// (Give Away flips black ↔ white so it stays loud in both modes).
+const CAT_MODES = {
+  light: {
+    tints: { 'Tools': '#F3F2EF', 'Home': '#F6F1EC', 'Outdoor': '#EFF3EE', 'Tech': '#EFF0F3', 'Other': '#F2EFEA', 'Give Away': '#F3F2EF', 'Sell': '#FBE9E8' },
+    give:  { chip: '#111111', chipFg: '#FFFFFF' },
+    sell:  { chip: '#E8312B', chipFg: '#FFFFFF' },
+  },
+  dark: {
+    tints: { 'Tools': '#1F1F1F', 'Home': '#221F1D', 'Outdoor': '#1D211D', 'Tech': '#1E1F22', 'Other': '#21201D', 'Give Away': '#1F1F1F', 'Sell': '#2A1413' },
+    give:  { chip: '#FFFFFF', chipFg: '#111111' },
+    sell:  { chip: '#E8312B', chipFg: '#FFFFFF' },
+  },
+};
+
+const THEME = { ...THEMES.light };
+
+function applyThemeMode(mode) {
+  const m = THEMES[mode] ? mode : 'light';
+  Object.assign(THEME, THEMES[m]);
+  const cm = CAT_MODES[m];
+  Object.keys(window.CAT_META).forEach(k => {
+    if (cm.tints[k]) window.CAT_META[k].tint = cm.tints[k];
+  });
+  Object.assign(window.CAT_META['Give Away'], cm.give);
+  Object.assign(window.CAT_META['Sell'], cm.sell);
+  document.body.style.background = THEME.bodyBg;
+}
 
 function Icon({ name, size = 22, color = 'currentColor', stroke = 2 }) {
   const p = { fill: 'none', stroke: color, strokeWidth: stroke, strokeLinecap: 'round', strokeLinejoin: 'round' };
@@ -53,8 +132,46 @@ function Icon({ name, size = 22, color = 'currentColor', stroke = 2 }) {
     mail:    <><rect x="3.5" y="5.5" width="17" height="13" rx="2.5" {...p} /><path d="M4 7l8 5.5L20 7" {...p} /></>,
     copy:    <><rect x="9" y="9" width="11" height="11" rx="2.5" {...p} /><path d="M5 15H4.5A1.5 1.5 0 013 13.5v-9A1.5 1.5 0 014.5 3h9A1.5 1.5 0 0115 4.5V5" {...p} /></>,
     trash:   <><path d="M5 7h14M9 7V5h6v2M7 7l1 12h8l1-12" {...p} /></>,
+    repeat:  <><path d="M17 2l4 4-4 4" {...p} /><path d="M3 11V9a4 4 0 014-4h14" {...p} /><path d="M7 22l-4-4 4-4" {...p} /><path d="M21 13v2a4 4 0 01-4 4H3" {...p} /></>,
+    sun:     <><circle cx="12" cy="12" r="4" {...p} /><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8" {...p} /></>,
+    moon:    <><path d="M20 13.5A8 8 0 1110.5 4a6.5 6.5 0 009.5 9.5z" {...p} /></>,
   };
   return <svg width={size} height={size} viewBox="0 0 24 24" style={{ display: 'block' }}>{paths[name]}</svg>;
+}
+
+// ShareKeep logo: red tile with the box (your stuff) and a small loop arrow —
+// it goes out and comes back.
+function BrandMark({ size = 76 }) {
+  const badge = Math.round(size * 0.38);
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: size * 0.29, background: THEME.accent,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative',
+      boxShadow: '0 8px 24px rgba(232,49,43,0.30)', flexShrink: 0,
+    }}>
+      <Icon name="box" size={size * 0.5} color="#fff" />
+      <div style={{
+        position: 'absolute', right: -badge * 0.26, bottom: -badge * 0.26,
+        width: badge, height: badge, borderRadius: '50%', background: '#111111',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        boxShadow: `0 0 0 2.5px ${THEME.bg}`,
+      }}>
+        <Icon name="repeat" size={badge * 0.56} color="#fff" stroke={2.4} />
+      </div>
+    </div>
+  );
+}
+
+// SHAREKEEP.ONLINE wordmark — black with the .ONLINE in signal red.
+function Wordmark({ size = 30 }) {
+  return (
+    <div style={{
+      fontFamily: 'Archivo Black, sans-serif', fontSize: size, color: THEME.ink,
+      letterSpacing: -0.5, lineHeight: 1, whiteSpace: 'nowrap',
+    }}>
+      SHAREKEEP<span style={{ color: THEME.accent }}>.ONLINE</span>
+    </div>
+  );
 }
 
 // Avatar — shows the member's Google photo when available, else initials on a warm tint.
@@ -69,7 +186,7 @@ function Avatar({ user, size = 40, ring = false }) {
       width: size, height: size, borderRadius: '50%', flexShrink: 0,
       background: u.color || THEME.accent, color: '#fff',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600,
+      fontFamily: 'Archivo Black, sans-serif', fontWeight: 600,
       fontSize: size * 0.4, letterSpacing: 0.2,
       boxShadow: ringStyle, userSelect: 'none',
     }}>{(u.name || '?')[0]}</div>
@@ -97,12 +214,12 @@ function AvatarPhoto({ src, alt, size, ringStyle, fallback }) {
 // Category thumbnail — shows the uploaded photo when present, else a warm placeholder tile.
 function ItemThumb({ item, height = 132, radius = 16 }) {
   const cat = window.normCat(item.cat);
-  const meta = window.CAT_META[cat] || { tint: '#E9E2D5', shape: 'circle' };
+  const meta = window.CAT_META[cat] || { tint: '#F3F2EF', shape: 'circle' };
   const market = window.marketInfo(item);
   const showTag = height >= 78;
   const shapeStyle = {
     position: 'absolute', width: '52%', aspectRatio: '1',
-    background: 'rgba(255,255,255,0.55)',
+    background: THEME.thumbShape,
     boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.03)',
     right: '-8%', bottom: '-14%',
   };
@@ -115,7 +232,7 @@ function ItemThumb({ item, height = 132, radius = 16 }) {
     <div style={{
       position: 'relative', width: '100%', height, borderRadius: radius,
       background: meta.tint, overflow: 'hidden', flexShrink: 0,
-      backgroundImage: 'radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1.4px)',
+      backgroundImage: `radial-gradient(${THEME.thumbDot} 1px, transparent 1.4px)`,
       backgroundSize: '12px 12px',
     }}>
       <div style={shapes[meta.shape]} />
@@ -128,9 +245,9 @@ function ItemThumb({ item, height = 132, radius = 16 }) {
         <div style={{
           position: 'absolute', top: 10, left: 10, zIndex: 2,
           display: 'flex', alignItems: 'center', gap: 4,
-          fontFamily: 'DM Mono, monospace', fontSize: 10.5, letterSpacing: 0.3,
+          fontFamily: 'Inter, sans-serif', fontSize: 10.5, letterSpacing: 0.3,
           textTransform: 'lowercase', color: meta.chip || THEME.inkSoft,
-          background: 'rgba(255,255,255,0.82)', padding: '3px 7px', borderRadius: 6,
+          background: THEME.tagBg, padding: '3px 7px', borderRadius: 6,
           backdropFilter: 'blur(2px)',
         }}>
           {meta.icon && <Icon name={meta.icon} size={11} color={meta.chip || THEME.inkSoft} />}
@@ -141,10 +258,10 @@ function ItemThumb({ item, height = 132, radius = 16 }) {
         <div style={{
           position: 'absolute', top: 10, right: 10, zIndex: 2,
           display: 'flex', alignItems: 'center', gap: 4,
-          background: market.color, color: '#fff', padding: '3px 8px', borderRadius: 999,
-          fontFamily: 'DM Sans, sans-serif', fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap',
+          background: market.color, color: market.fg, padding: '3px 8px', borderRadius: 999,
+          fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap',
         }}>
-          <Icon name={market.icon} size={11} color="#fff" />
+          <Icon name={market.icon} size={11} color={market.fg} />
           {market.label}
         </div>
       )}
@@ -155,10 +272,10 @@ function ItemThumb({ item, height = 132, radius = 16 }) {
 function StatusBadge({ status, due, small = false }) {
   let bg = THEME.goodSoft, fg = THEME.good, label = 'Available', dot = THEME.good;
   if (status === 'pending') { bg = THEME.accentSoft; fg = THEME.accentDeep; label = 'Requested'; dot = THEME.accent; }
-  else if (status === 'gone') { bg = '#E7E0D6'; fg = THEME.inkSoft; label = 'Taken'; dot = THEME.inkFaint; }
+  else if (status === 'gone') { bg = THEME.neutralSoft; fg = THEME.inkSoft; label = 'Taken'; dot = THEME.inkFaint; }
   else if (status === 'out') {
     const r = due ? window.relativeDue(due) : null;
-    bg = '#EFE7DA'; fg = THEME.inkSoft; dot = THEME.inkFaint; label = 'On loan';
+    bg = THEME.neutralSoft; fg = THEME.inkSoft; dot = THEME.inkFaint; label = 'On loan';
     if (r && r.tone === 'over') { fg = THEME.over; dot = THEME.over; }
   }
   return (
@@ -167,7 +284,7 @@ function StatusBadge({ status, due, small = false }) {
       background: bg, color: fg, borderRadius: 999,
       padding: small ? '3px 9px' : '5px 11px',
       fontSize: small ? 11.5 : 12.5, fontWeight: 600,
-      fontFamily: 'DM Sans, sans-serif', whiteSpace: 'nowrap',
+      fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap',
     }}>
       <span style={{ width: 6, height: 6, borderRadius: '50%', background: dot }} />
       {label}
@@ -179,17 +296,18 @@ function Btn({ children, onClick, variant = 'primary', full = false, size = 'md'
   const sizes = { sm: { pad: '9px 14px', fs: 14 }, md: { pad: '13px 18px', fs: 15.5 }, lg: { pad: '16px 20px', fs: 16.5 } };
   const s = sizes[size];
   const variants = {
-    primary: { background: disabled ? '#D8CFC3' : THEME.accent, color: '#fff', border: 'none', boxShadow: disabled ? 'none' : '0 2px 10px rgba(194,105,63,0.32)' },
+    primary: { background: disabled ? THEME.disabledBg : THEME.accent, color: '#fff', border: 'none', boxShadow: disabled ? 'none' : '0 2px 10px rgba(232,49,43,0.30)' },
     soft:    { background: THEME.accentSoft, color: THEME.accentDeep, border: 'none' },
     ghost:   { background: THEME.surface, color: THEME.ink, border: `1.5px solid ${THEME.line}` },
-    danger:  { background: '#FBF1EE', color: THEME.over, border: `1.5px solid #EAD3CC` },
-    good:    { background: THEME.good, color: '#fff', border: 'none', boxShadow: '0 2px 10px rgba(110,139,102,0.3)' },
+    danger:  { background: THEME.dangerSoft, color: THEME.over, border: `1.5px solid ${THEME.dangerLine}` },
+    good:    { background: THEME.good, color: THEME.mode === 'dark' ? '#10240E' : '#fff', border: 'none', boxShadow: '0 2px 10px rgba(59,109,17,0.28)' },
+    dark:    { background: THEME.btnContrast, color: THEME.btnContrastFg, border: 'none' },
   };
   const v = variants[variant] || variants.primary;
   return (
     <button onClick={disabled ? undefined : onClick} disabled={disabled} style={{
       ...v, padding: s.pad, fontSize: s.fs, width: full ? '100%' : 'auto',
-      fontFamily: 'DM Sans, sans-serif', fontWeight: 600, borderRadius: 14,
+      fontFamily: 'Inter, sans-serif', fontWeight: 600, borderRadius: 14,
       cursor: disabled ? 'default' : 'pointer', display: 'inline-flex',
       alignItems: 'center', justifyContent: 'center', gap: 8, whiteSpace: 'nowrap',
       transition: 'transform .12s ease, filter .12s ease', WebkitTapHighlightColor: 'transparent',
@@ -234,7 +352,7 @@ function Sheet({ open, onClose, children, title }) {
         maxHeight: '86%', overflowY: 'auto', boxShadow: '0 -10px 40px rgba(40,30,20,0.18)',
       }}>
         <div style={{ width: 38, height: 5, borderRadius: 99, background: THEME.line, margin: '0 auto 14px' }} />
-        {title && <div style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600, fontSize: 21, color: THEME.ink, marginBottom: 14 }}>{title}</div>}
+        {title && <div style={{ fontFamily: 'Archivo Black, sans-serif', fontWeight: 600, fontSize: 21, color: THEME.ink, marginBottom: 14 }}>{title}</div>}
         {children}
         <div style={{ height: 24 }} />
       </div>
@@ -247,15 +365,19 @@ function Toast({ toast }) {
   return (
     <div style={{
       position: 'absolute', left: 16, right: 16, bottom: 104, zIndex: 300,
-      background: THEME.ink, color: '#fff', borderRadius: 16,
+      background: THEME.toastBg, color: '#fff', borderRadius: 16,
       padding: '13px 16px', display: 'flex', alignItems: 'center', gap: 11,
-      fontFamily: 'DM Sans, sans-serif', fontSize: 14.5, fontWeight: 500,
+      fontFamily: 'Inter, sans-serif', fontSize: 14.5, fontWeight: 500,
       boxShadow: '0 8px 28px rgba(0,0,0,0.28)', animation: 'toastIn .32s cubic-bezier(.16,1,.3,1) both',
     }}>
-      {toast.icon && <span style={{ color: THEME.accentSoft, display: 'flex' }}><Icon name={toast.icon} size={19} /></span>}
+      {toast.icon && <span style={{ color: THEME.accent, display: 'flex' }}><Icon name={toast.icon} size={19} /></span>}
       <span style={{ flex: 1 }}>{toast.msg}</span>
     </div>
   );
 }
 
-Object.assign(window, { THEME, Icon, Avatar, ItemThumb, StatusBadge, Btn, Card, Sheet, Toast });
+Object.assign(window, { THEME, applyThemeMode, Icon, Avatar, ItemThumb, StatusBadge, Btn, Card, Sheet, Toast, BrandMark, Wordmark });
+
+// Restore the saved mode (covers sign-in and onboarding, which render
+// before the in-app toggle exists).
+applyThemeMode((() => { try { return localStorage.getItem('sk.mode'); } catch (e) { return null; } })() || 'light');
