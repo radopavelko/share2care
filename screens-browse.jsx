@@ -80,7 +80,7 @@ function BrowseScreen({ app }) {
     ? (app.group.memberUids || [])
     : [...new Set(app.groups.flatMap(g => g.memberUids || []))];
   const stackIds = [uid, ...circleIds.filter(id => id !== uid)].filter(id => app.members[id]);
-  const cats = ['All', ...window.CATEGORIES];
+  const cats = ['All', ...window.LEND_CATEGORIES];
   const gid = app.groupId;
   const myGroupIds = app.groups.map(g => g.id);
   let list = app.items.filter(it => {
@@ -100,8 +100,16 @@ function BrowseScreen({ app }) {
   return (
     <div style={{ paddingBottom: 120 }}>
       <div style={{ padding: '46px 20px 6px' }}>
-        <div style={{ marginBottom: 12 }}>
+        <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
           <window.GroupSwitcher app={app} />
+          <button onClick={app.toggleTheme} aria-label="Switch light/dark mode" style={{
+            width: 36, height: 36, borderRadius: '50%', flexShrink: 0, cursor: 'pointer',
+            background: T.surface, border: `1px solid ${T.line}`, boxShadow: T.shadowSm,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            WebkitTapHighlightColor: 'transparent',
+          }}>
+            <window.Icon name={app.themeMode === 'dark' ? 'sun' : 'moon'} size={17} color={T.inkSoft} />
+          </button>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <div style={{ minWidth: 0 }}>
@@ -140,6 +148,28 @@ function BrowseScreen({ app }) {
               transition: 'all .14s ease',
             }}>
               {meta && meta.icon && <window.Icon name={meta.icon} size={14} color={on ? '#fff' : accent} />}
+              {c}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Give Away / Sell live below the lending categories, in their own colours */}
+      <div style={{ display: 'flex', gap: 8, padding: '0 20px 10px' }}>
+        {window.MARKET_CATEGORIES.map(c => {
+          const meta = window.CAT_META[c];
+          const on = cat === c;
+          return (
+            <button key={c} onClick={() => setCat(on ? 'All' : c)} style={{
+              flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+              padding: '10px 12px', borderRadius: 13,
+              fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: 700, cursor: 'pointer',
+              border: `1.5px solid ${meta.chip}`,
+              background: on ? meta.chip : T.surface,
+              color: on ? meta.chipFg : meta.chip, whiteSpace: 'nowrap',
+              transition: 'all .14s ease', WebkitTapHighlightColor: 'transparent',
+            }}>
+              <window.Icon name={meta.icon} size={15} color={on ? meta.chipFg : meta.chip} />
               {c}
             </button>
           );

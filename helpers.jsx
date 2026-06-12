@@ -36,7 +36,9 @@ function relativeDue(iso) {
 // their own accent colour (meta.chip) so they stand out from regular lending.
 // Items saved under any earlier category set are mapped via normCat so they
 // keep filtering and displaying correctly.
-const CATEGORIES = ['Tools', 'Home', 'Outdoor', 'Tech', 'Other', 'Give Away', 'Sell'];
+const LEND_CATEGORIES = ['Tools', 'Home', 'Outdoor', 'Tech', 'Other'];
+const MARKET_CATEGORIES = ['Give Away', 'Sell'];
+const CATEGORIES = [...LEND_CATEGORIES, ...MARKET_CATEGORIES];
 const LEGACY_CATS = {
   // original 8-category era
   'Kitchen': 'Home',
@@ -64,13 +66,13 @@ const CAT_META = {
 // Returns null for regular (lending) categories.
 function marketInfo(item) {
   const c = normCat(item.cat);
-  if (c === 'Sell') return { kind: 'sell', label: (item.price || '').trim() || 'For sale', icon: 'tag', color: CAT_META['Sell'].chip };
-  if (c === 'Give Away') return { kind: 'give', label: 'Free', icon: 'gift', color: CAT_META['Give Away'].chip };
+  if (c === 'Sell') return { kind: 'sell', label: (item.price || '').trim() || 'For sale', icon: 'tag', color: CAT_META['Sell'].chip, fg: CAT_META['Sell'].chipFg || '#fff' };
+  if (c === 'Give Away') return { kind: 'give', label: 'Free', icon: 'gift', color: CAT_META['Give Away'].chip, fg: CAT_META['Give Away'].chipFg || '#fff' };
   return null;
 }
 
 Object.assign(window, {
   todayMidnight, addDays, isoFromOffset, fmtDate, daysUntil, relativeDue,
-  CATEGORIES, CAT_META, normCat, marketInfo,
+  CATEGORIES, LEND_CATEGORIES, MARKET_CATEGORIES, CAT_META, normCat, marketInfo,
   MEMBERS: {}, // live lookup of users, synced by App
 });

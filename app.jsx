@@ -34,7 +34,7 @@ function SignIn({ onSignIn, error }) {
 
       <button onClick={go} disabled={busy} style={{
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 11,
-        background: '#111111', color: '#fff', border: 'none',
+        background: T.btnContrast, color: T.btnContrastFg, border: 'none',
         borderRadius: 14, padding: '15px 24px', cursor: busy ? 'default' : 'pointer',
         fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 16,
         opacity: busy ? 0.6 : 1, WebkitTapHighlightColor: 'transparent',
@@ -67,6 +67,7 @@ function App({ me }) {
     try { return localStorage.getItem('s2.group.' + me.id) || null; } catch (e) { return null; }
   });
   const [tab, setTab] = useState('browse');
+  const [themeMode, setThemeMode] = useState(window.THEME.mode);
   const [detailId, setDetailId] = useState(null);
   const [modal, setModal] = useState(null);
   const [modalArg, setModalArg] = useState(null);
@@ -154,6 +155,14 @@ function App({ me }) {
     groups: myGroups, group, groupId, allGroups: groups,
 
     goTab: (x) => { setDetailId(null); setModal(null); setModalArg(null); setTab(x); },
+
+    themeMode,
+    toggleTheme: () => {
+      const next = themeMode === 'light' ? 'dark' : 'light';
+      window.applyThemeMode(next);
+      try { localStorage.setItem('sk.mode', next); } catch (e) { /* ignore */ }
+      setThemeMode(next);
+    },
     openItem: (id) => setDetailId(id),
     closeItem: () => setDetailId(null),
     openModal: (m, arg = null) => { setModal(m); setModalArg(arg); },
@@ -293,7 +302,7 @@ function App({ me }) {
     notifyWhenFree: (it) => toast(`We’ll let you know when ${it.name} is free`, 'bell'),
 
     signOut: () => window.S2.signOut(),
-  }), [items, requests, members, modal, modalArg, groups, groupId, me, uid]);
+  }), [items, requests, members, modal, modalArg, groups, groupId, me, uid, themeMode]);
 
   const incomingCount = requests.filter(r => r.toUid === uid && r.status === 'pending').length;
   const detailItem = detailId ? items.find(i => i.id === detailId) : null;
