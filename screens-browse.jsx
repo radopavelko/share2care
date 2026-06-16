@@ -132,26 +132,22 @@ function BrowseScreen({ app }) {
         </div>
       </div>
 
-      {/* All categories in one wrapping row — same pill shape; Give Away / Sell
-          keep their own colours but match the lending chips' size. */}
+      {/* All categories in one wrapping row — every chip the same shape and colour. */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '6px 20px 10px' }}>
         {cats.map(c => {
           const meta = window.CAT_META[c];
-          const market = window.MARKET_CATEGORIES.includes(c);
-          const accent = market ? meta.chip : T.accent;
-          const onFg = market ? meta.chipFg : '#fff';
           const on = cat === c;
           return (
             <button key={c} onClick={() => setCat(on && c !== 'All' ? 'All' : c)} style={{
               flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 6,
               padding: '8px 14px', borderRadius: 999,
-              fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: market ? 700 : 600, cursor: 'pointer',
-              border: `1.5px solid ${on ? accent : (market ? meta.chip : T.line)}`,
-              background: on ? accent : T.surface,
-              color: on ? onFg : (market ? meta.chip : T.inkSoft), whiteSpace: 'nowrap',
+              fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: 600, cursor: 'pointer',
+              border: `1.5px solid ${on ? T.accent : T.line}`,
+              background: on ? T.accent : T.surface,
+              color: on ? '#fff' : T.inkSoft, whiteSpace: 'nowrap',
               transition: 'all .14s ease', WebkitTapHighlightColor: 'transparent',
             }}>
-              {meta && meta.icon && <window.Icon name={meta.icon} size={14} color={on ? onFg : accent} />}
+              {meta && meta.icon && <window.Icon name={meta.icon} size={14} color={on ? '#fff' : T.accent} />}
               {c}
             </button>
           );
