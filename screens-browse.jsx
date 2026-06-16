@@ -80,7 +80,7 @@ function BrowseScreen({ app }) {
     ? (app.group.memberUids || [])
     : [...new Set(app.groups.flatMap(g => g.memberUids || []))];
   const stackIds = [uid, ...circleIds.filter(id => id !== uid)].filter(id => app.members[id]);
-  const cats = ['All', ...window.LEND_CATEGORIES];
+  const cats = ['All', ...window.LEND_CATEGORIES, ...window.MARKET_CATEGORIES];
   const gid = app.groupId;
   const myGroupIds = app.groups.map(g => g.id);
   let list = app.items.filter(it => {
@@ -132,44 +132,26 @@ function BrowseScreen({ app }) {
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '6px 20px 10px', scrollbarWidth: 'none' }} className="no-sb">
+      {/* All categories in one wrapping row — same pill shape; Give Away / Sell
+          keep their own colours but match the lending chips' size. */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '6px 20px 10px' }}>
         {cats.map(c => {
           const meta = window.CAT_META[c];
-          const accent = (meta && meta.chip) || T.accent;
+          const market = window.MARKET_CATEGORIES.includes(c);
+          const accent = market ? meta.chip : T.accent;
+          const onFg = market ? meta.chipFg : '#fff';
           const on = cat === c;
           return (
-            <button key={c} onClick={() => setCat(c)} style={{
+            <button key={c} onClick={() => setCat(on && c !== 'All' ? 'All' : c)} style={{
               flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 6,
               padding: '8px 14px', borderRadius: 999,
-              fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: 600, cursor: 'pointer',
-              border: `1.5px solid ${on ? accent : T.line}`,
+              fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: market ? 700 : 600, cursor: 'pointer',
+              border: `1.5px solid ${on ? accent : (market ? meta.chip : T.line)}`,
               background: on ? accent : T.surface,
-              color: on ? '#fff' : T.inkSoft, whiteSpace: 'nowrap',
-              transition: 'all .14s ease',
-            }}>
-              {meta && meta.icon && <window.Icon name={meta.icon} size={14} color={on ? '#fff' : accent} />}
-              {c}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Give Away / Sell live below the lending categories, in their own colours */}
-      <div style={{ display: 'flex', gap: 8, padding: '0 20px 10px' }}>
-        {window.MARKET_CATEGORIES.map(c => {
-          const meta = window.CAT_META[c];
-          const on = cat === c;
-          return (
-            <button key={c} onClick={() => setCat(on ? 'All' : c)} style={{
-              flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7,
-              padding: '10px 12px', borderRadius: 13,
-              fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: 700, cursor: 'pointer',
-              border: `1.5px solid ${meta.chip}`,
-              background: on ? meta.chip : T.surface,
-              color: on ? meta.chipFg : meta.chip, whiteSpace: 'nowrap',
+              color: on ? onFg : (market ? meta.chip : T.inkSoft), whiteSpace: 'nowrap',
               transition: 'all .14s ease', WebkitTapHighlightColor: 'transparent',
             }}>
-              <window.Icon name={meta.icon} size={15} color={on ? meta.chipFg : meta.chip} />
+              {meta && meta.icon && <window.Icon name={meta.icon} size={14} color={on ? onFg : accent} />}
               {c}
             </button>
           );
