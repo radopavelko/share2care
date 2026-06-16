@@ -1,103 +1,43 @@
-// theme.jsx — ShareKeep.Online design tokens (white / black / signal red, in a
-// light and a dark flavour) + shared presentational components.
+// theme.jsx — ShareKeep.Online design tokens (light only: white / black /
+// Renault yellow with a subtle modern gradient) + shared presentational
+// components.
 //
-// THEME is a single mutable object: applyThemeMode() copies the chosen palette
-// into it (and re-tints CAT_META), then the app re-renders so every component
-// picks up the new values.
+// Yellow is bright, so it can't be used as text on white. The split:
+//   accentGrad / accentBright → large & small fills (with dark onAccent text)
+//   accent (amber)            → accent text, icons, borders on light surfaces
 
-const THEMES = {
-  light: {
-    mode:      'light',
-    bg:        '#FAFAF8',
-    surface:   '#FFFFFF',
-    surfaceAlt:'#F3F2EF',
-    ink:       '#111111',
-    inkSoft:   '#6B6B6B',
-    inkFaint:  '#9A9894',
-    line:      '#E2E0DC',
-    lineSoft:  '#ECEAE6',
-    accent:    '#E8312B',
-    accentDeep:'#B5211C',
-    accentSoft:'#FBE9E8',
-    good:      '#3B6D11',
-    goodSoft:  '#E9F2E6',
-    warn:      '#B07A2E',
-    over:      '#B5211C',
-    neutralSoft:'#EAE9E6',
-    dangerSoft:'#FDF1F0',
-    dangerLine:'#F3C9C6',
-    disabledBg:'#D8D6D2',
-    toastBg:   '#111111',
-    tagBg:     'rgba(255,255,255,0.82)',
-    thumbDot:  'rgba(255,255,255,0.6)',
-    thumbShape:'rgba(255,255,255,0.55)',
-    btnContrast:'#111111',
-    btnContrastFg:'#FFFFFF',
-    bodyBg:    '#EBEAE7',
-    shadow:    '0 1px 2px rgba(0,0,0,0.04), 0 8px 22px rgba(0,0,0,0.06)',
-    shadowSm:  '0 1px 2px rgba(0,0,0,0.04)',
-  },
-  dark: {
-    mode:      'dark',
-    bg:        '#0E0E0E',
-    surface:   '#1A1A1A',
-    surfaceAlt:'#232323',
-    ink:       '#FFFFFF',
-    inkSoft:   '#B9B9B9',
-    inkFaint:  '#7C7C7C',
-    line:      '#2E2E2E',
-    lineSoft:  '#262626',
-    accent:    '#E8312B',
-    accentDeep:'#F08D89',
-    accentSoft:'#2A1413',
-    good:      '#7FBF7A',
-    goodSoft:  '#1F2B1F',
-    warn:      '#D9A05B',
-    over:      '#F08D89',
-    neutralSoft:'#262626',
-    dangerSoft:'#2A1413',
-    dangerLine:'#4A201E',
-    disabledBg:'#3A3A3A',
-    toastBg:   '#2A2A2A',
-    tagBg:     'rgba(18,18,18,0.85)',
-    thumbDot:  'rgba(255,255,255,0.05)',
-    thumbShape:'rgba(255,255,255,0.06)',
-    btnContrast:'#FFFFFF',
-    btnContrastFg:'#111111',
-    bodyBg:    '#0A0A0A',
-    shadow:    '0 1px 2px rgba(0,0,0,0.4), 0 8px 22px rgba(0,0,0,0.5)',
-    shadowSm:  '0 1px 2px rgba(0,0,0,0.4)',
-  },
+const THEME = {
+  bg:         '#FAFAF8',
+  surface:    '#FFFFFF',
+  surfaceAlt: '#F3F2EF',
+  ink:        '#111111',
+  inkSoft:    '#6B6B6B',
+  inkFaint:   '#9A9894',
+  line:       '#E2E0DC',
+  lineSoft:   '#ECEAE6',
+  accent:     '#B07A00',   // readable amber for accent text / icons / borders
+  accentBright:'#F5B400',  // solid bright yellow for small fills
+  accentGrad: 'linear-gradient(135deg, #FFD63D 0%, #F5B400 100%)', // big fills
+  onAccent:   '#1A1300',   // text / icons sitting on a yellow fill
+  accentDeep: '#8A6000',   // accent text on the soft tint
+  accentSoft: '#FFF4D6',
+  good:       '#3B6D11',
+  goodSoft:   '#E9F2E6',
+  warn:       '#B07A2E',
+  over:       '#B5211C',
+  neutralSoft:'#EAE9E6',
+  dangerSoft: '#FDF1F0',
+  dangerLine: '#F3C9C6',
+  disabledBg: '#E2DECF',
+  toastBg:    '#111111',
+  tagBg:      'rgba(255,255,255,0.82)',
+  thumbDot:   'rgba(255,255,255,0.6)',
+  thumbShape: 'rgba(255,255,255,0.55)',
+  btnContrast:'#111111',
+  btnContrastFg:'#FFFFFF',
+  shadow:     '0 1px 2px rgba(0,0,0,0.04), 0 8px 22px rgba(0,0,0,0.06)',
+  shadowSm:   '0 1px 2px rgba(0,0,0,0.04)',
 };
-
-// Per-mode category tile tints and the Give Away / Sell button colours
-// (Give Away flips black ↔ white so it stays loud in both modes).
-const CAT_MODES = {
-  light: {
-    tints: { 'Tools': '#F3F2EF', 'Home': '#F6F1EC', 'Outdoor': '#EFF3EE', 'Tech': '#EFF0F3', 'Other': '#F2EFEA', 'Give Away': '#F3F2EF', 'Sell': '#FBE9E8' },
-    give:  { chip: '#111111', chipFg: '#FFFFFF' },
-    sell:  { chip: '#E8312B', chipFg: '#FFFFFF' },
-  },
-  dark: {
-    tints: { 'Tools': '#1F1F1F', 'Home': '#221F1D', 'Outdoor': '#1D211D', 'Tech': '#1E1F22', 'Other': '#21201D', 'Give Away': '#1F1F1F', 'Sell': '#2A1413' },
-    give:  { chip: '#FFFFFF', chipFg: '#111111' },
-    sell:  { chip: '#E8312B', chipFg: '#FFFFFF' },
-  },
-};
-
-const THEME = { ...THEMES.light };
-
-function applyThemeMode(mode) {
-  const m = THEMES[mode] ? mode : 'light';
-  Object.assign(THEME, THEMES[m]);
-  const cm = CAT_MODES[m];
-  Object.keys(window.CAT_META).forEach(k => {
-    if (cm.tints[k]) window.CAT_META[k].tint = cm.tints[k];
-  });
-  Object.assign(window.CAT_META['Give Away'], cm.give);
-  Object.assign(window.CAT_META['Sell'], cm.sell);
-  document.body.style.background = THEME.bodyBg;
-}
 
 function Icon({ name, size = 22, color = 'currentColor', stroke = 2 }) {
   const p = { fill: 'none', stroke: color, strokeWidth: stroke, strokeLinecap: 'round', strokeLinejoin: 'round' };
@@ -139,17 +79,17 @@ function Icon({ name, size = 22, color = 'currentColor', stroke = 2 }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" style={{ display: 'block' }}>{paths[name]}</svg>;
 }
 
-// ShareKeep logo: red tile with the box (your stuff) and a small loop arrow —
-// it goes out and comes back.
+// ShareKeep logo: yellow gradient tile with the box (your stuff) and a small
+// loop arrow — it goes out and comes back.
 function BrandMark({ size = 76 }) {
   const badge = Math.round(size * 0.38);
   return (
     <div style={{
-      width: size, height: size, borderRadius: size * 0.29, background: THEME.accent,
+      width: size, height: size, borderRadius: size * 0.29, background: THEME.accentGrad,
       display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative',
-      boxShadow: '0 8px 24px rgba(232,49,43,0.30)', flexShrink: 0,
+      boxShadow: '0 8px 24px rgba(245,180,0,0.34)', flexShrink: 0,
     }}>
-      <Icon name="box" size={size * 0.5} color="#fff" />
+      <Icon name="box" size={size * 0.5} color={THEME.onAccent} />
       <div style={{
         position: 'absolute', right: -badge * 0.26, bottom: -badge * 0.26,
         width: badge, height: badge, borderRadius: '50%', background: '#111111',
@@ -162,7 +102,7 @@ function BrandMark({ size = 76 }) {
   );
 }
 
-// SHAREKEEP.ONLINE wordmark — black with the .ONLINE in signal red.
+// SHAREKEEP.ONLINE wordmark — black with the .ONLINE in the accent.
 function Wordmark({ size = 30 }) {
   return (
     <div style={{
@@ -258,10 +198,10 @@ function ItemThumb({ item, height = 132, radius = 16 }) {
         <div style={{
           position: 'absolute', top: 10, right: 10, zIndex: 2,
           display: 'flex', alignItems: 'center', gap: 4,
-          background: market.color, color: market.fg, padding: '3px 8px', borderRadius: 999,
+          background: market.badgeBg, color: market.badgeFg, padding: '3px 8px', borderRadius: 999,
           fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap',
         }}>
-          <Icon name={market.icon} size={11} color={market.fg} />
+          <Icon name={market.icon} size={11} color={market.badgeFg} />
           {market.label}
         </div>
       )}
@@ -296,11 +236,11 @@ function Btn({ children, onClick, variant = 'primary', full = false, size = 'md'
   const sizes = { sm: { pad: '9px 14px', fs: 14 }, md: { pad: '13px 18px', fs: 15.5 }, lg: { pad: '16px 20px', fs: 16.5 } };
   const s = sizes[size];
   const variants = {
-    primary: { background: disabled ? THEME.disabledBg : THEME.accent, color: '#fff', border: 'none', boxShadow: disabled ? 'none' : '0 2px 10px rgba(232,49,43,0.30)' },
+    primary: { background: disabled ? THEME.disabledBg : THEME.accentGrad, color: disabled ? '#fff' : THEME.onAccent, border: 'none', boxShadow: disabled ? 'none' : '0 2px 10px rgba(245,180,0,0.34)' },
     soft:    { background: THEME.accentSoft, color: THEME.accentDeep, border: 'none' },
     ghost:   { background: THEME.surface, color: THEME.ink, border: `1.5px solid ${THEME.line}` },
     danger:  { background: THEME.dangerSoft, color: THEME.over, border: `1.5px solid ${THEME.dangerLine}` },
-    good:    { background: THEME.good, color: THEME.mode === 'dark' ? '#10240E' : '#fff', border: 'none', boxShadow: '0 2px 10px rgba(59,109,17,0.28)' },
+    good:    { background: THEME.good, color: '#fff', border: 'none', boxShadow: '0 2px 10px rgba(59,109,17,0.28)' },
     dark:    { background: THEME.btnContrast, color: THEME.btnContrastFg, border: 'none' },
   };
   const v = variants[variant] || variants.primary;
@@ -376,8 +316,4 @@ function Toast({ toast }) {
   );
 }
 
-Object.assign(window, { THEME, applyThemeMode, Icon, Avatar, ItemThumb, StatusBadge, Btn, Card, Sheet, Toast, BrandMark, Wordmark });
-
-// Restore the saved mode (covers sign-in and onboarding, which render
-// before the in-app toggle exists).
-applyThemeMode((() => { try { return localStorage.getItem('sk.mode'); } catch (e) { return null; } })() || 'light');
+Object.assign(window, { THEME, Icon, Avatar, ItemThumb, StatusBadge, Btn, Card, Sheet, Toast, BrandMark, Wordmark });

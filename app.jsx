@@ -24,7 +24,7 @@ function SignIn({ onSignIn, error }) {
         fontFamily: 'Archivo Black, sans-serif', fontSize: 26, color: T.ink, letterSpacing: -0.5,
         lineHeight: 1.1, textTransform: 'uppercase', marginTop: 22,
       }}>
-        Borrow. Lend.<br /><span style={{ color: T.accent }}>Sell it on.</span><br />Buy less.
+        Borrow. Lend.<br /><span style={{ background: T.accentGrad, color: T.onAccent, borderRadius: 6, padding: '0 8px', boxDecorationBreak: 'clone', WebkitBoxDecorationBreak: 'clone' }}>Sell it on.</span><br />Buy less.
       </div>
       <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 15, color: T.inkSoft, marginTop: 12, maxWidth: 270, lineHeight: 1.55, textWrap: 'pretty' }}>
         One shelf for your trusted circle. Their things and yours — moving, not gathering dust.
@@ -67,7 +67,6 @@ function App({ me }) {
     try { return localStorage.getItem('s2.group.' + me.id) || null; } catch (e) { return null; }
   });
   const [tab, setTab] = useState('browse');
-  const [themeMode, setThemeMode] = useState(window.THEME.mode);
   const [detailId, setDetailId] = useState(null);
   const [modal, setModal] = useState(null);
   const [modalArg, setModalArg] = useState(null);
@@ -156,13 +155,6 @@ function App({ me }) {
 
     goTab: (x) => { setDetailId(null); setModal(null); setModalArg(null); setTab(x); },
 
-    themeMode,
-    toggleTheme: () => {
-      const next = themeMode === 'light' ? 'dark' : 'light';
-      window.applyThemeMode(next);
-      try { localStorage.setItem('sk.mode', next); } catch (e) { /* ignore */ }
-      setThemeMode(next);
-    },
     openItem: (id) => setDetailId(id),
     closeItem: () => setDetailId(null),
     openModal: (m, arg = null) => { setModal(m); setModalArg(arg); },
@@ -302,7 +294,7 @@ function App({ me }) {
     notifyWhenFree: (it) => toast(`We’ll let you know when ${it.name} is free`, 'bell'),
 
     signOut: () => window.S2.signOut(),
-  }), [items, requests, members, modal, modalArg, groups, groupId, me, uid, themeMode]);
+  }), [items, requests, members, modal, modalArg, groups, groupId, me, uid]);
 
   const incomingCount = requests.filter(r => r.toUid === uid && r.status === 'pending').length;
   const detailItem = detailId ? items.find(i => i.id === detailId) : null;

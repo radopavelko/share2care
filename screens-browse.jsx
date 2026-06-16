@@ -100,16 +100,8 @@ function BrowseScreen({ app }) {
   return (
     <div style={{ paddingBottom: 120 }}>
       <div style={{ padding: '46px 20px 6px' }}>
-        <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+        <div style={{ marginBottom: 12 }}>
           <window.GroupSwitcher app={app} />
-          <button onClick={app.toggleTheme} aria-label="Switch light/dark mode" style={{
-            width: 36, height: 36, borderRadius: '50%', flexShrink: 0, cursor: 'pointer',
-            background: T.surface, border: `1px solid ${T.line}`, boxShadow: T.shadowSm,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            WebkitTapHighlightColor: 'transparent',
-          }}>
-            <window.Icon name={app.themeMode === 'dark' ? 'sun' : 'moon'} size={17} color={T.inkSoft} />
-          </button>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <div style={{ minWidth: 0 }}>
@@ -142,12 +134,12 @@ function BrowseScreen({ app }) {
               flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 6,
               padding: '8px 14px', borderRadius: 999,
               fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: 600, cursor: 'pointer',
-              border: `1.5px solid ${on ? T.accent : T.line}`,
-              background: on ? T.accent : T.surface,
-              color: on ? '#fff' : T.inkSoft, whiteSpace: 'nowrap',
+              border: `1.5px solid ${on ? 'transparent' : T.line}`,
+              background: on ? T.accentGrad : T.surface,
+              color: on ? T.onAccent : T.inkSoft, whiteSpace: 'nowrap',
               transition: 'all .14s ease', WebkitTapHighlightColor: 'transparent',
             }}>
-              {meta && meta.icon && <window.Icon name={meta.icon} size={14} color={on ? '#fff' : T.accent} />}
+              {meta && meta.icon && <window.Icon name={meta.icon} size={14} color={on ? T.onAccent : T.accent} />}
               {c}
             </button>
           );

@@ -36,8 +36,8 @@ const provider = new GoogleAuthProvider();
 
 // Deterministic brand colour from a uid, so each member gets a stable avatar tint.
 const AVATAR_COLORS = [
-  "#E8312B", "#111111", "#B5211C", "#3B6D11", "#B07A2E",
-  "#444444", "#6B6B6B", "#8C2E2A", "#2E4E1E", "#7A5A23",
+  "#111111", "#3B6D11", "#B07A00", "#444444", "#6B6B6B",
+  "#2E4E1E", "#7A5A23", "#5A5A5A", "#3F5A2A", "#8A6D1F",
 ];
 function colorFor(uid) {
   let h = 0;

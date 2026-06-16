@@ -72,11 +72,11 @@ function CategoryPicker({ value, onChange }) {
               display: 'inline-flex', alignItems: 'center', gap: 6,
               padding: '9px 13px', borderRadius: 999, cursor: 'pointer',
               fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: 600,
-              border: `1.5px solid ${on ? T.accent : T.line}`,
-              background: on ? T.accent : T.surface, color: on ? '#fff' : T.inkSoft,
+              border: `1.5px solid ${on ? 'transparent' : T.line}`,
+              background: on ? T.accentGrad : T.surface, color: on ? T.onAccent : T.inkSoft,
               transition: 'all .14s ease',
             }}>
-              {meta && meta.icon && <window.Icon name={meta.icon} size={14} color={on ? '#fff' : T.accent} />}
+              {meta && meta.icon && <window.Icon name={meta.icon} size={14} color={on ? T.onAccent : T.accent} />}
               {c}
             </button>
           );
@@ -87,16 +87,19 @@ function CategoryPicker({ value, onChange }) {
         {window.MARKET_CATEGORIES.map(c => {
           const meta = window.CAT_META[c];
           const on = value === c;
+          const isSell = c === 'Sell';
+          const activeBg = isSell ? T.accentBright : '#111111';
+          const activeFg = isSell ? T.onAccent : '#FFFFFF';
           return (
             <button key={c} onClick={() => onChange(c)} style={{
               flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7,
               padding: '11px 12px', borderRadius: 13, cursor: 'pointer',
               fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: 700,
               border: `1.5px solid ${meta.chip}`,
-              background: on ? meta.chip : T.surface, color: on ? meta.chipFg : meta.chip,
+              background: on ? activeBg : T.surface, color: on ? activeFg : meta.chip,
               transition: 'all .14s ease',
             }}>
-              <window.Icon name={meta.icon} size={15} color={on ? meta.chipFg : meta.chip} />
+              <window.Icon name={meta.icon} size={15} color={on ? activeFg : meta.chip} />
               {c}
             </button>
           );

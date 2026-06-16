@@ -59,15 +59,17 @@ const CAT_META = {
   'Tech':      { tint: '#EFF0F3', shape: 'circle',  icon: 'screen' },
   'Other':     { tint: '#F2EFEA', shape: 'square',  icon: 'dots'   },
   'Give Away': { tint: '#F3F2EF', shape: 'circle',  icon: 'gift',  chip: '#111111' },
-  'Sell':      { tint: '#FBE9E8', shape: 'diamond', icon: 'tag',   chip: '#E8312B' },
+  'Sell':      { tint: '#FFF7E0', shape: 'diamond', icon: 'tag',   chip: '#B07A00' },
 };
 
 // For Sell / Give Away items: what little badge and flow they get.
 // Returns null for regular (lending) categories.
 function marketInfo(item) {
   const c = normCat(item.cat);
-  if (c === 'Sell') return { kind: 'sell', label: (item.price || '').trim() || 'For sale', icon: 'tag', color: CAT_META['Sell'].chip, fg: CAT_META['Sell'].chipFg || '#fff' };
-  if (c === 'Give Away') return { kind: 'give', label: 'Free', icon: 'gift', color: CAT_META['Give Away'].chip, fg: CAT_META['Give Away'].chipFg || '#fff' };
+  // `color` is used for text/icons on light surfaces (must be readable);
+  // `badgeBg`/`badgeFg` are for the small pill on item photos.
+  if (c === 'Sell') return { kind: 'sell', label: (item.price || '').trim() || 'For sale', icon: 'tag', color: '#B07A00', badgeBg: '#F5B400', badgeFg: '#1A1300' };
+  if (c === 'Give Away') return { kind: 'give', label: 'Free', icon: 'gift', color: '#111111', badgeBg: '#111111', badgeFg: '#FFFFFF' };
   return null;
 }
 
