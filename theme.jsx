@@ -76,15 +76,27 @@ function AvatarPhoto({ src, alt, size, ringStyle, fallback }) {
   );
 }
 
-// Item photo, or a quiet grey tile with a box glyph.
-function ItemThumb({ item, height = 120, radius = 14 }) {
+// Item photo, or a quiet grey tile with a box glyph. The whole photo is always
+// shown (never cropped). With `auto`, the tile grows to the photo's own
+// proportions up to `height`; otherwise it's a fixed box the photo fits inside.
+function ItemThumb({ item, height = 120, radius = 14, auto = false }) {
+  const base = { position: 'relative', width: '100%', borderRadius: radius, background: THEME.surfaceAlt, overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' };
+  if (item.photoURL && auto) {
+    return (
+      <div style={base}>
+        <img src={item.photoURL} alt={item.name}
+          onError={e => { e.currentTarget.style.display = 'none'; }}
+          style={{ width: '100%', height: 'auto', maxHeight: height, objectFit: 'contain', display: 'block' }} />
+      </div>
+    );
+  }
   return (
-    <div style={{ position: 'relative', width: '100%', height, borderRadius: radius, background: THEME.surfaceAlt, overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ ...base, height }}>
       <Icon name="box" size={Math.max(20, height * 0.32)} color={THEME.inkFaint} stroke={1.6} />
       {item.photoURL && (
         <img src={item.photoURL} alt={item.name} loading="lazy"
           onError={e => { e.currentTarget.style.display = 'none'; }}
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
       )}
     </div>
   );

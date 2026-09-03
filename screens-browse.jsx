@@ -150,7 +150,7 @@ function ItemDetail({ app, item }) {
   return (
     <div style={{ position: 'absolute', inset: 0, background: T.bg, zIndex: 150, overflowY: 'auto', animation: 'screenIn .26s cubic-bezier(.16,1,.3,1) both' }}>
       <div style={{ position: 'relative', padding: '8px 8px 0' }}>
-        <window.ItemThumb item={item} height={280} radius={20} />
+        <window.ItemThumb item={item} height={460} radius={20} auto />
         <button onClick={app.closeItem} style={{
           position: 'absolute', top: 52, left: 20, width: 38, height: 38, borderRadius: '50%',
           background: 'rgba(255,255,255,0.92)', border: 'none', cursor: 'pointer',
