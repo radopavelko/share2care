@@ -16,6 +16,7 @@ const THEME = {
   onAccent:   '#1A1300',                                              // text on yellow
   accentText: '#9A7400',                                              // yellow as *text* on light
   accentSoft: '#FFF5CC',
+  logoYellow: '#FCC408',                                              // exact yellow of the logo tile
   good:       '#2E7D32',
   goodSoft:   '#E6F3E7',
   over:       '#C62828',
@@ -289,7 +290,7 @@ function BrandMark({ size = 76 }) {
 function Wordmark({ size = 26 }) {
   return (
     <div style={{ fontFamily: THEME.font, fontWeight: 800, fontSize: size, color: THEME.ink, letterSpacing: -0.8, lineHeight: 1, whiteSpace: 'nowrap' }}>
-      ShareKeep<span style={{ color: THEME.accentText }}>.online</span>
+      ShareKeep<span style={{ color: THEME.logoYellow }}>.online</span>
     </div>
   );
 }

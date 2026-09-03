@@ -13,10 +13,10 @@ function SignIn({ onSignIn, error }) {
   };
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 32px', background: T.bg }}>
-      <div style={{ marginBottom: 26 }}><window.BrandMark size={84} /></div>
+      <img src="logo.png" alt="ShareKeep" style={{ width: 150, height: 'auto', display: 'block', marginBottom: 22, userSelect: 'none' }} />
       <window.Wordmark size={27} />
-      <div style={{ fontFamily: T.font, fontSize: 16, color: T.inkSoft, marginTop: 12, maxWidth: 270, lineHeight: 1.5, textWrap: 'pretty' }}>
-        Share your things with people you trust, and always know who has what.
+      <div style={{ fontFamily: T.font, fontSize: 16, color: T.inkSoft, marginTop: 12, maxWidth: 280, lineHeight: 1.5, textWrap: 'pretty' }}>
+        Share with care. Keep with trust.<br />Track it online.
       </div>
       <div style={{ height: 34 }} />
       <button onClick={go} disabled={busy} style={{
@@ -346,7 +346,7 @@ function Root() {
   if (!ready || authUser === undefined) {
     content = (
       <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: T.bg }}>
-        <div className="pulse-dot"><window.BrandMark size={56} /></div>
+        <img className="pulse-dot" src="logo.png" alt="" style={{ width: 96, height: 'auto', display: 'block' }} />
       </div>
     );
   } else if (!authUser || !me) {
