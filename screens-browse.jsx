@@ -140,7 +140,14 @@ function ItemDetail({ app, item }) {
   if (holder === uid) {
     action = <window.Btn variant="dark" full size="lg" onClick={() => app.returnItem(item.id)}><window.Icon name="check" size={18} /> I returned it</window.Btn>;
   } else if (isMine && holder) {
-    action = <window.Btn variant="dark" full size="lg" onClick={() => app.returnItem(item.id)}><window.Icon name="check" size={18} /> Got it back</window.Btn>;
+    action = (
+      <div style={{ display: 'flex', gap: 10 }}>
+        <window.Btn variant="dark" full size="lg" onClick={() => app.returnItem(item.id)}><window.Icon name="check" size={18} /> Got it back</window.Btn>
+        <window.Btn variant="ghost" size="lg" onClick={() => app.openModal('lendTo', item.id)}><window.Icon name="users" size={18} /></window.Btn>
+      </div>
+    );
+  } else if (isMine && !holder) {
+    action = <window.Btn variant="primary" full size="lg" onClick={() => app.openModal('lendTo', item.id)}><window.Icon name="hand" size={19} /> Lend to someone</window.Btn>;
   } else if (!isMine && !holder) {
     action = <window.Btn variant="primary" full size="lg" onClick={() => app.takeItem(item.id)}><window.Icon name="hand" size={19} /> I’ve got it</window.Btn>;
   } else if (!isMine && holder) {

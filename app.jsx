@@ -203,7 +203,17 @@ function App({ me }) {
         toast('Noted — you have it now', 'hand');
       } catch (e) { console.error(e); toast('Could not update', 'x'); }
     },
+    // Owner records who has it (picked from the group members).
+    lendTo: async (itemId, memberUid) => {
+      closeAll();
+      const m = members[memberUid];
+      try {
+        await window.S2.updateItem(itemId, { holderUid: memberUid, takenAt: window.S2.serverTimestamp(), status: 'out', borrowerUid: memberUid });
+        toast(`Lent to ${m ? m.name : 'them'}`, 'hand');
+      } catch (e) { console.error(e); toast('Could not update', 'x'); }
+    },
     returnItem: async (itemId) => {
+      closeAll();
       try {
         await window.S2.updateItem(itemId, { holderUid: null, takenAt: null, status: 'available', borrowerUid: null, due: null });
         toast('Back on the shelf', 'box');
@@ -257,6 +267,7 @@ function App({ me }) {
       <window.Toast toast={toastData} />
       <window.NewItemSheet app={app} />
       <window.EditItemSheet app={app} />
+      <window.LendToSheet app={app} />
       <window.GroupSheets app={app} />
     </div>
   );

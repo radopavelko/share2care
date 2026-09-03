@@ -103,4 +103,51 @@ function EditItemSheet({ app }) {
   );
 }
 
-Object.assign(window, { NewItemSheet, EditItemSheet });
+// Owner picks who has the item (from the members of the groups it's shared
+// with), or marks it home.
+function LendToSheet({ app }) {
+  if (app.modal !== 'lendTo') return null;
+  const T = window.THEME;
+  const item = app.items.find(i => i.id === app.modalArg);
+  if (!item || item.ownerUid !== app.uid) return null;
+  const holder = window.holderOf(item);
+
+  const gids = item.groups || [];
+  const pool = gids.length ? app.allGroups.filter(g => gids.includes(g.id)) : app.groups;
+  const ids = [...new Set(pool.flatMap(g => g.memberUids || []))].filter(id => id !== app.uid && app.members[id]);
+
+  const Row = ({ id, name, sub, on, onClick, avatar }) => (
+    <button onClick={onClick} style={{
+      display: 'flex', alignItems: 'center', gap: 12, width: '100%', textAlign: 'left', padding: '10px 12px', borderRadius: 14, cursor: 'pointer',
+      border: `1px solid ${on ? 'transparent' : T.line}`, background: on ? T.accentSoft : T.surface, WebkitTapHighlightColor: 'transparent',
+    }}>
+      {avatar}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontFamily: T.font, fontWeight: 600, fontSize: 15, color: T.ink }}>{name}</div>
+        {sub && <div style={{ fontFamily: T.font, fontSize: 12.5, color: T.inkSoft }}>{sub}</div>}
+      </div>
+      {on && <window.Icon name="check" size={18} color={T.accentText} />}
+    </button>
+  );
+
+  return (
+    <window.Sheet open title="Who has it?" onClose={app.closeModal}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <Row name="Nobody — it’s home" sub="Mark as returned" on={!holder} onClick={() => app.returnItem(item.id)}
+          avatar={<div style={{ width: 36, height: 36, borderRadius: '50%', background: T.surfaceAlt, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><window.Icon name="box" size={18} color={T.inkSoft} /></div>} />
+        {ids.map(id => {
+          const m = app.members[id];
+          return <Row key={id} name={m.full || m.name} sub={holder === id ? `Has it${window.fmtSince(item.takenAt) ? ' · since ' + window.fmtSince(item.takenAt) : ''}` : null}
+            on={holder === id} onClick={() => app.lendTo(item.id, id)} avatar={<window.Avatar user={id} size={36} />} />;
+        })}
+      </div>
+      {ids.length === 0 && (
+        <div style={{ fontFamily: T.font, fontSize: 13.5, color: T.inkFaint, marginTop: 12, lineHeight: 1.5, textWrap: 'pretty' }}>
+          {gids.length ? 'No other members in this item’s groups yet.' : 'Share this item with a group to pick from its members.'}
+        </div>
+      )}
+    </window.Sheet>
+  );
+}
+
+Object.assign(window, { NewItemSheet, EditItemSheet, LendToSheet });
