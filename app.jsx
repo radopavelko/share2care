@@ -178,6 +178,18 @@ function App({ me }) {
       catch (e) { console.error(e); toast('Could not update sharing', 'x'); }
     },
     inviteLink: (g) => `${window.location.origin}${window.location.pathname}?join=${g.code}`,
+    setGroupPhoto: async (gid, file) => {
+      try {
+        toast('Uploading photo…', 'camera');
+        const photoURL = await window.S2.uploadPhoto(file, uid);
+        await window.S2.updateGroup(gid, { photoURL });
+        toast('Group photo set', 'check');
+      } catch (e) { console.error(e); toast(failMsg(e, 'Could not upload photo'), 'x'); }
+    },
+    removeGroupPhoto: async (gid) => {
+      try { await window.S2.updateGroup(gid, { photoURL: '' }); }
+      catch (e) { console.error(e); toast('Could not update group', 'x'); }
+    },
     setGroupColor: async (gid, color) => {
       try { await window.S2.updateGroup(gid, { color: color || '' }); }
       catch (e) { console.error(e); toast('Could not update group', 'x'); }

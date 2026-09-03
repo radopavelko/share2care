@@ -226,12 +226,15 @@ function ManageGroupSheet({ app }) {
     if (ok) setEmail('');
   };
 
+  const fileRef = useRefGr(null);
+  const pickPhoto = (e) => { const f = e.target.files && e.target.files[0]; if (f) app.setGroupPhoto(g.id, f); e.target.value = ''; };
+
   return (
     <window.Sheet open title={g.name} onClose={app.closeModal}>
-      {/* Group colour (owner only) */}
+      {/* Group picture: colour, or an uploaded photo (owner only) */}
       {isOwner && (
         <div style={{ marginBottom: 20 }}>
-          <div style={{ fontFamily: T.font, fontWeight: 600, fontSize: 13.5, color: T.ink, marginBottom: 8 }}>Colour</div>
+          <div style={{ fontFamily: T.font, fontWeight: 600, fontSize: 13.5, color: T.ink, marginBottom: 8 }}>Picture</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <window.GroupAvatar group={g} size={44} />
             <div style={{ display: 'flex', gap: 10 }}>
@@ -247,6 +250,14 @@ function ManageGroupSheet({ app }) {
               })}
             </div>
           </div>
+          <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+            <input ref={fileRef} type="file" accept="image/*" onChange={pickPhoto} style={{ display: 'none' }} />
+            <window.Btn variant="ghost" size="sm" onClick={() => fileRef.current && fileRef.current.click()}>
+              <window.Icon name="camera" size={15} /> {g.photoURL ? 'Change photo' : 'Use a photo'}
+            </window.Btn>
+            {g.photoURL && <window.Btn variant="soft" size="sm" onClick={() => app.removeGroupPhoto(g.id)}>Remove photo</window.Btn>}
+          </div>
+          {g.photoURL && <div style={{ fontFamily: T.font, fontSize: 12.5, color: T.inkFaint, marginTop: 8 }}>The photo is shown instead of the colour.</div>}
         </div>
       )}
 

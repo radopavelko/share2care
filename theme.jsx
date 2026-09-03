@@ -243,9 +243,17 @@ const GROUP_COLORS = [
   { bg: '#6E6E73', fg: '#FFFFFF', name: 'Grey' },
   { bg: '#E4E4E2', fg: '#111111', name: 'Light' },
 ];
-// Group badge: the people glyph on the group's colour (soft yellow if unset).
+// Group badge: the group's photo if it has one, else the people glyph on the
+// group's colour (soft yellow if unset).
 function GroupAvatar({ group, size = 38, radius }) {
   const r = radius != null ? radius : Math.round(size * 0.29);
+  if (group && group.photoURL) {
+    return (
+      <div style={{ width: size, height: size, borderRadius: r, flexShrink: 0, overflow: 'hidden', background: THEME.surfaceAlt }}>
+        <img src={group.photoURL} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { e.currentTarget.style.display = 'none'; }} />
+      </div>
+    );
+  }
   const c = GROUP_COLORS.find(x => x.bg === (group && group.color));
   const bg = c ? c.bg : THEME.accentSoft;
   const fg = c ? c.fg : THEME.accentText;
