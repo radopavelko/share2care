@@ -235,17 +235,25 @@ function EmptyHint({ text }) {
   );
 }
 
-// Group picture: uploaded photo, else an emoji, else the people glyph.
+// Group colours — five tones from the theme. A group stores `color` (the bg).
+const GROUP_COLORS = [
+  { bg: '#FFC300', fg: '#1A1300', name: 'Yellow' },
+  { bg: '#9A7400', fg: '#FFFFFF', name: 'Amber' },
+  { bg: '#111111', fg: '#FFFFFF', name: 'Black' },
+  { bg: '#6E6E73', fg: '#FFFFFF', name: 'Grey' },
+  { bg: '#E4E4E2', fg: '#111111', name: 'Light' },
+];
+// Group badge: the people glyph on the group's colour (soft yellow if unset).
 function GroupAvatar({ group, size = 38, radius }) {
   const r = radius != null ? radius : Math.round(size * 0.29);
-  const base = { width: size, height: size, borderRadius: r, flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: THEME.accentSoft };
-  if (group && group.photoURL) {
-    return <div style={base}><img src={group.photoURL} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { e.currentTarget.style.display = 'none'; }} /></div>;
-  }
-  if (group && group.emoji) {
-    return <div style={{ ...base, fontSize: size * 0.56, lineHeight: 1 }}>{group.emoji}</div>;
-  }
-  return <div style={base}><Icon name="users" size={size * 0.5} color={THEME.accentText} /></div>;
+  const c = GROUP_COLORS.find(x => x.bg === (group && group.color));
+  const bg = c ? c.bg : THEME.accentSoft;
+  const fg = c ? c.fg : THEME.accentText;
+  return (
+    <div style={{ width: size, height: size, borderRadius: r, flexShrink: 0, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Icon name="users" size={size * 0.5} color={fg} />
+    </div>
+  );
 }
 
 // Logo: yellow gradient tile with the box + loop badge.
@@ -274,4 +282,4 @@ function Wordmark({ size = 26 }) {
   );
 }
 
-Object.assign(window, { THEME, Icon, Avatar, GroupAvatar, ItemThumb, Pill, StatusPill, Btn, Card, Sheet, Toast, Field, inputStyle, SectionLabel, EmptyHint, BrandMark, Wordmark });
+Object.assign(window, { THEME, GROUP_COLORS, Icon, Avatar, GroupAvatar, ItemThumb, Pill, StatusPill, Btn, Card, Sheet, Toast, Field, inputStyle, SectionLabel, EmptyHint, BrandMark, Wordmark });

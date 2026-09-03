@@ -178,18 +178,9 @@ function App({ me }) {
       catch (e) { console.error(e); toast('Could not update sharing', 'x'); }
     },
     inviteLink: (g) => `${window.location.origin}${window.location.pathname}?join=${g.code}`,
-    // Group picture: an emoji, an uploaded photo, or none.
-    setGroupEmoji: async (gid, emoji) => {
-      try { await window.S2.updateGroup(gid, { emoji: (emoji || '').trim(), photoURL: '' }); }
+    setGroupColor: async (gid, color) => {
+      try { await window.S2.updateGroup(gid, { color: color || '' }); }
       catch (e) { console.error(e); toast('Could not update group', 'x'); }
-    },
-    setGroupPhoto: async (gid, file) => {
-      try {
-        toast('Uploading photo…', 'camera');
-        const photoURL = await window.S2.uploadPhoto(file, uid);
-        await window.S2.updateGroup(gid, { photoURL, emoji: '' });
-        toast('Group photo updated', 'check');
-      } catch (e) { console.error(e); toast(failMsg(e, 'Could not update group'), 'x'); }
     },
 
     // ── Items ──

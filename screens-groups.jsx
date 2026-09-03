@@ -226,32 +226,26 @@ function ManageGroupSheet({ app }) {
     if (ok) setEmail('');
   };
 
-  const EMOJIS = ['🏠','🏘️','👨‍👩‍👧','🧰','🔧','🪜','🚲','⛺','🎣','🧗','⚽','🎸','📚','🎲','🍳','🌱','🐶','🚗','🛠️','❤️'];
-  const fileRef = useRefGr(null);
-  const pickPhoto = (e) => { const f = e.target.files && e.target.files[0]; if (f) app.setGroupPhoto(g.id, f); e.target.value = ''; };
-
   return (
     <window.Sheet open title={g.name} onClose={app.closeModal}>
-      {/* Group picture (owner only) */}
+      {/* Group colour (owner only) */}
       {isOwner && (
         <div style={{ marginBottom: 20 }}>
-          <div style={{ fontFamily: T.font, fontWeight: 600, fontSize: 13.5, color: T.ink, marginBottom: 8 }}>Group picture</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-            <window.GroupAvatar group={g} size={56} />
-            <input ref={fileRef} type="file" accept="image/*" onChange={pickPhoto} style={{ display: 'none' }} />
-            <window.Btn variant="ghost" size="sm" onClick={() => fileRef.current && fileRef.current.click()}><window.Icon name="camera" size={15} /> Photo</window.Btn>
-            {(g.emoji || g.photoURL) && <window.Btn variant="soft" size="sm" onClick={() => app.setGroupEmoji(g.id, '')}>Remove</window.Btn>}
-          </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {EMOJIS.map(em => (
-              <button key={em} onClick={() => app.setGroupEmoji(g.id, em)} style={{
-                width: 38, height: 38, borderRadius: 11, cursor: 'pointer', fontSize: 20, lineHeight: 1,
-                border: `1px solid ${g.emoji === em ? 'transparent' : T.line}`, background: g.emoji === em ? T.accentSoft : T.surface,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, WebkitTapHighlightColor: 'transparent',
-              }}>{em}</button>
-            ))}
-            <input placeholder="or any emoji" maxLength={4} onKeyDown={e => { if (e.key === 'Enter' && e.target.value.trim()) { app.setGroupEmoji(g.id, e.target.value); e.target.value = ''; } }}
-              style={{ ...window.inputStyle(T), width: 120, padding: '8px 12px', fontSize: 14 }} />
+          <div style={{ fontFamily: T.font, fontWeight: 600, fontSize: 13.5, color: T.ink, marginBottom: 8 }}>Colour</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <window.GroupAvatar group={g} size={44} />
+            <div style={{ display: 'flex', gap: 10 }}>
+              {window.GROUP_COLORS.map(c => {
+                const on = g.color === c.bg;
+                return (
+                  <button key={c.bg} aria-label={c.name} onClick={() => app.setGroupColor(g.id, on ? '' : c.bg)} style={{
+                    width: 34, height: 34, borderRadius: '50%', background: c.bg, cursor: 'pointer', padding: 0,
+                    border: `2px solid ${T.surface}`, boxShadow: on ? `0 0 0 2px ${T.ink}` : `0 0 0 1px ${T.line}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', WebkitTapHighlightColor: 'transparent',
+                  }}>{on && <window.Icon name="check" size={16} color={c.fg} stroke={2.6} />}</button>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}
