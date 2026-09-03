@@ -185,6 +185,16 @@ window.S2 = {
   }),
   updateItem: (id, patch) => updateDoc(doc(db, "items", id), patch),
   deleteItem: (id) => deleteDoc(doc(db, "items", id)),
+  // Who-has-what changes. `closed` is the loan being completed (if any), kept
+  // on the item as a small history log: { holderUid, from, to }.
+  lendItem: (id, memberUid, closed) => updateDoc(doc(db, "items", id), {
+    holderUid: memberUid, takenAt: serverTimestamp(), status: "out", borrowerUid: memberUid,
+    ...(closed ? { history: arrayUnion(closed) } : {}),
+  }),
+  returnItem: (id, closed) => updateDoc(doc(db, "items", id), {
+    holderUid: null, takenAt: null, status: "available", borrowerUid: null, due: null,
+    ...(closed ? { history: arrayUnion(closed) } : {}),
+  }),
 
   // photo upload → returns a download URL
   uploadPhoto: async (file, uid) => {

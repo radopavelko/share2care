@@ -24,6 +24,13 @@ function BorrowsScreen({ app }) {
   const out = app.items.filter(it => it.ownerUid === uid && window.holderOf(it) && window.holderOf(it) !== uid);
   const nameOf = id => { const m = window.MEMBERS[id]; return m ? m.name : 'someone'; };
   const sinceOf = it => { const s = window.fmtSince(it.takenAt); return s ? ` · since ${s}` : ''; };
+  // Completed loans involving me (my things, or things I held), newest first.
+  const toMs = t => (t && t.toDate ? t.toDate() : t ? new Date(t) : new Date(0)).getTime();
+  const history = app.items
+    .flatMap(it => (it.history || []).map(h => ({ ...h, item: it })))
+    .filter(h => h.item.ownerUid === uid || h.holderUid === uid)
+    .sort((a, b) => toMs(b.to) - toMs(a.to))
+    .slice(0, 100);
 
   return (
     <div style={{ paddingBottom: 120 }}>
@@ -45,7 +52,7 @@ function BorrowsScreen({ app }) {
           )}
         </div>
 
-        <div style={{ marginBottom: 20 }}>
+        <div style={{ marginBottom: 26 }}>
           <window.SectionLabel count={out.length}>Out with others</window.SectionLabel>
           {out.length === 0 ? <window.EmptyHint text="All your things are home." /> : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -54,6 +61,27 @@ function BorrowsScreen({ app }) {
                   subtitle={`With ${nameOf(window.holderOf(it))}${sinceOf(it)}`} />
               ))}
             </div>
+          )}
+        </div>
+
+        <div style={{ marginBottom: 20 }}>
+          <window.SectionLabel count={history.length || null}>History</window.SectionLabel>
+          {history.length === 0 ? <window.EmptyHint text="Completed loans will show up here." /> : (
+            <window.Card style={{ maxHeight: 300, overflowY: 'auto' }}>
+              {history.map((h, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '11px 14px', borderTop: i ? `1px solid ${T.lineSoft}` : 'none' }}>
+                  <window.Avatar user={h.holderUid} size={28} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: T.font, fontSize: 14, color: T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <b style={{ fontWeight: 600 }}>{h.holderUid === uid ? 'You' : nameOf(h.holderUid)}</b> had <b style={{ fontWeight: 600 }}>{h.item.name}</b>
+                    </div>
+                    <div style={{ fontFamily: T.font, fontSize: 12.5, color: T.inkSoft, marginTop: 1 }}>
+                      {h.item.ownerUid === uid ? 'yours' : `${nameOf(h.item.ownerUid)}’s`} · {window.fmtSince(h.from) ? `${window.fmtSince(h.from)} – ` : ''}{window.fmtSince(h.to)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </window.Card>
           )}
         </div>
       </div>

@@ -111,6 +111,15 @@ function App({ me }) {
   };
   const closeAll = () => { setModal(null); setModalArg(null); };
 
+  // The loan that ends when an item changes hands or comes home (null if it
+  // wasn't out). Stored on the item as history: { holderUid, from, to }.
+  const closedLoan = (itemId) => {
+    const it = items.find(i => i.id === itemId);
+    const h = window.holderOf(it);
+    if (!h) return null;
+    return { holderUid: h, from: it.takenAt || null, to: new Date() };
+  };
+
   // Turn a Firebase error into something a person can act on.
   const failMsg = (e, base) => {
     const c = (e && e.code) || '';
@@ -199,7 +208,7 @@ function App({ me }) {
     // ── Who has what (one tap, trust-based) ──
     takeItem: async (itemId) => {
       try {
-        await window.S2.updateItem(itemId, { holderUid: uid, takenAt: window.S2.serverTimestamp(), status: 'out', borrowerUid: uid });
+        await window.S2.lendItem(itemId, uid, closedLoan(itemId));
         toast('Noted — you have it now', 'hand');
       } catch (e) { console.error(e); toast('Could not update', 'x'); }
     },
@@ -208,14 +217,14 @@ function App({ me }) {
       closeAll();
       const m = members[memberUid];
       try {
-        await window.S2.updateItem(itemId, { holderUid: memberUid, takenAt: window.S2.serverTimestamp(), status: 'out', borrowerUid: memberUid });
+        await window.S2.lendItem(itemId, memberUid, closedLoan(itemId));
         toast(`Lent to ${m ? m.name : 'them'}`, 'hand');
       } catch (e) { console.error(e); toast('Could not update', 'x'); }
     },
     returnItem: async (itemId) => {
       closeAll();
       try {
-        await window.S2.updateItem(itemId, { holderUid: null, takenAt: null, status: 'available', borrowerUid: null, due: null });
+        await window.S2.returnItem(itemId, closedLoan(itemId));
         toast('Back on the shelf', 'box');
       } catch (e) { console.error(e); toast('Could not update', 'x'); }
     },
