@@ -15,7 +15,7 @@ function GroupSwitcher({ app }) {
       padding: '7px 12px', boxShadow: T.shadowSm, maxWidth: '100%',
       WebkitTapHighlightColor: 'transparent',
     }}>
-      <window.Icon name="users" size={16} color={T.accentText} />
+      {app.group ? <window.GroupAvatar group={app.group} size={20} radius={6} /> : <window.Icon name="users" size={16} color={T.accentText} />}
       <span style={{
         fontFamily: T.font, fontWeight: 600, fontSize: 13.5, color: T.ink,
         whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 150,
@@ -46,13 +46,15 @@ function GroupSwitcherSheet({ app }) {
               border: `1px solid ${active ? 'transparent' : T.line}`,
               background: active ? T.accentSoft : T.surface,
             }}>
-              <div style={{
-                width: 38, height: 38, borderRadius: 11, flexShrink: 0,
-                background: active ? T.accentGrad : T.surfaceAlt, color: active ? T.onAccent : T.inkSoft,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <window.Icon name={r.id ? 'users' : 'box'} size={19} />
-              </div>
+              {r.g ? <window.GroupAvatar group={r.g} size={38} /> : (
+                <div style={{
+                  width: 38, height: 38, borderRadius: 11, flexShrink: 0,
+                  background: active ? T.accentGrad : T.surfaceAlt, color: active ? T.onAccent : T.inkSoft,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <window.Icon name="box" size={19} />
+                </div>
+              )}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontFamily: T.font, fontWeight: 600, fontSize: 15, color: T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.name}</div>
                 <div style={{ fontFamily: T.font, fontSize: 12.5, color: T.inkSoft }}>{r.sub}</div>
@@ -224,8 +226,36 @@ function ManageGroupSheet({ app }) {
     if (ok) setEmail('');
   };
 
+  const EMOJIS = ['🏠','🏘️','👨‍👩‍👧','🧰','🔧','🪜','🚲','⛺','🎣','🧗','⚽','🎸','📚','🎲','🍳','🌱','🐶','🚗','🛠️','❤️'];
+  const fileRef = useRefGr(null);
+  const pickPhoto = (e) => { const f = e.target.files && e.target.files[0]; if (f) app.setGroupPhoto(g.id, f); e.target.value = ''; };
+
   return (
     <window.Sheet open title={g.name} onClose={app.closeModal}>
+      {/* Group picture (owner only) */}
+      {isOwner && (
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontFamily: T.font, fontWeight: 600, fontSize: 13.5, color: T.ink, marginBottom: 8 }}>Group picture</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+            <window.GroupAvatar group={g} size={56} />
+            <input ref={fileRef} type="file" accept="image/*" onChange={pickPhoto} style={{ display: 'none' }} />
+            <window.Btn variant="ghost" size="sm" onClick={() => fileRef.current && fileRef.current.click()}><window.Icon name="camera" size={15} /> Photo</window.Btn>
+            {(g.emoji || g.photoURL) && <window.Btn variant="soft" size="sm" onClick={() => app.setGroupEmoji(g.id, '')}>Remove</window.Btn>}
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {EMOJIS.map(em => (
+              <button key={em} onClick={() => app.setGroupEmoji(g.id, em)} style={{
+                width: 38, height: 38, borderRadius: 11, cursor: 'pointer', fontSize: 20, lineHeight: 1,
+                border: `1px solid ${g.emoji === em ? 'transparent' : T.line}`, background: g.emoji === em ? T.accentSoft : T.surface,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, WebkitTapHighlightColor: 'transparent',
+              }}>{em}</button>
+            ))}
+            <input placeholder="or any emoji" maxLength={4} onKeyDown={e => { if (e.key === 'Enter' && e.target.value.trim()) { app.setGroupEmoji(g.id, e.target.value); e.target.value = ''; } }}
+              style={{ ...window.inputStyle(T), width: 120, padding: '8px 12px', fontSize: 14 }} />
+          </div>
+        </div>
+      )}
+
       {/* Invite link */}
       <div style={{ fontFamily: T.font, fontWeight: 600, fontSize: 13.5, color: T.ink, marginBottom: 8 }}>Invite link</div>
       <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>

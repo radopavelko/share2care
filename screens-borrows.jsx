@@ -113,9 +113,7 @@ function ProfileScreen({ app }) {
             {app.groups.map(g => (
               <window.Card key={g.id} onClick={() => app.openModal('manageGroup', g.id)} style={{ padding: '12px 14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 38, height: 38, borderRadius: 11, flexShrink: 0, background: T.accentSoft, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <window.Icon name="users" size={19} color={T.accentText} />
-                  </div>
+                  <window.GroupAvatar group={g} size={38} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontFamily: T.font, fontWeight: 600, fontSize: 15, color: T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{g.name}</div>
                     <div style={{ fontFamily: T.font, fontSize: 12.5, color: T.inkSoft, marginTop: 1 }}>

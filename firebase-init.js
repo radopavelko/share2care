@@ -162,6 +162,7 @@ window.S2 = {
     });
     return ref.id;
   },
+  updateGroup: (groupId, patch) => updateDoc(doc(db, "groups", groupId), patch),
   // Join by code, using a client-side list of groups (open read in this MVP).
   joinGroupById: (groupId, uid) =>
     updateDoc(doc(db, "groups", groupId), { memberUids: arrayUnion(uid) }),

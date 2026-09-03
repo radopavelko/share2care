@@ -235,6 +235,19 @@ function EmptyHint({ text }) {
   );
 }
 
+// Group picture: uploaded photo, else an emoji, else the people glyph.
+function GroupAvatar({ group, size = 38, radius }) {
+  const r = radius != null ? radius : Math.round(size * 0.29);
+  const base = { width: size, height: size, borderRadius: r, flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: THEME.accentSoft };
+  if (group && group.photoURL) {
+    return <div style={base}><img src={group.photoURL} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { e.currentTarget.style.display = 'none'; }} /></div>;
+  }
+  if (group && group.emoji) {
+    return <div style={{ ...base, fontSize: size * 0.56, lineHeight: 1 }}>{group.emoji}</div>;
+  }
+  return <div style={base}><Icon name="users" size={size * 0.5} color={THEME.accentText} /></div>;
+}
+
 // Logo: yellow gradient tile with the box + loop badge.
 function BrandMark({ size = 76 }) {
   const badge = Math.round(size * 0.38);
@@ -261,4 +274,4 @@ function Wordmark({ size = 26 }) {
   );
 }
 
-Object.assign(window, { THEME, Icon, Avatar, ItemThumb, Pill, StatusPill, Btn, Card, Sheet, Toast, Field, inputStyle, SectionLabel, EmptyHint, BrandMark, Wordmark });
+Object.assign(window, { THEME, Icon, Avatar, GroupAvatar, ItemThumb, Pill, StatusPill, Btn, Card, Sheet, Toast, Field, inputStyle, SectionLabel, EmptyHint, BrandMark, Wordmark });
