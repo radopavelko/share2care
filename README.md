@@ -12,7 +12,7 @@ Share your things with people you trust, and always know who has what.
 ## How it works
 
 - **Shelf** — everything shared with you: your own things plus items in the groups you belong to. Pick a group to see just that group.
-- **Who has what** — tap a thing and say *I've got it*; tap *I returned it* when it's back. Owners can also mark *Got it back*. No requests, no approvals — trust-based, one tap.
+- **Who has what** — tap a thing and say *I am borrowing it*; tap *I returned it* when it's back. Owners can also mark *Got it back*. No requests, no approvals — trust-based, one tap.
 - **Loans** — what you're holding, and which of your things are out.
 - **You** — your groups (create, join by link/code, invite by email) and your things.
 

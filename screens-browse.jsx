@@ -149,7 +149,7 @@ function ItemDetail({ app, item }) {
   } else if (isMine && !holder) {
     action = <window.Btn variant="primary" full size="lg" onClick={() => app.openModal('lendTo', item.id)}><window.Icon name="hand" size={19} /> Lend to someone</window.Btn>;
   } else if (!isMine && !holder) {
-    action = <window.Btn variant="primary" full size="lg" onClick={() => app.takeItem(item.id)}><window.Icon name="hand" size={19} /> I’ve got it</window.Btn>;
+    action = <window.Btn variant="primary" full size="lg" onClick={() => app.takeItem(item.id)}><window.Icon name="hand" size={19} /> I am borrowing it</window.Btn>;
   } else if (!isMine && holder) {
     action = <window.Btn variant="soft" full size="lg" disabled>With {holderUser ? holderUser.name : 'someone'}</window.Btn>;
   }
