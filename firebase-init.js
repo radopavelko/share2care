@@ -188,10 +188,18 @@ window.S2 = {
 
   // photo upload → returns a download URL
   uploadPhoto: async (file, uid) => {
-    const blob = await downscaleImage(file);
-    const path = `items/${uid}/${Date.now()}.jpg`;
-    const r = storageRef(storage, path);
-    await uploadBytes(r, blob, { contentType: "image/jpeg" });
+    let blob, ext = "jpg", type = "image/jpeg";
+    try {
+      blob = await downscaleImage(file);
+    } catch (e) {
+      // e.g. an iPhone HEIC on a browser that can't decode it — send the original
+      console.warn("downscale failed, uploading original", e);
+      blob = file;
+      ext = (file.name && file.name.includes(".")) ? file.name.split(".").pop().toLowerCase() : "jpg";
+      type = file.type || ((ext === "heic" || ext === "heif") ? "image/heic" : "image/jpeg");
+    }
+    const r = storageRef(storage, `items/${uid}/${Date.now()}.${ext}`);
+    await uploadBytes(r, blob, { contentType: type });
     return getDownloadURL(r);
   },
 

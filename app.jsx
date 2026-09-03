@@ -107,9 +107,18 @@ function App({ me }) {
   const toast = (msg, icon) => {
     setToastData({ msg, icon, k: Date.now() });
     if (toastTimer.current) clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToastData(null), 2600);
+    toastTimer.current = setTimeout(() => setToastData(null), Math.max(2600, String(msg).length * 55));
   };
   const closeAll = () => { setModal(null); setModalArg(null); };
+
+  // Turn a Firebase error into something a person can act on.
+  const failMsg = (e, base) => {
+    const c = (e && e.code) || '';
+    if (c === 'storage/unauthorized' || c === 'storage/unauthenticated') return 'Photo upload blocked — publish storage.rules in Firebase → Storage → Rules';
+    if (c.startsWith('storage/')) return `Photo upload failed (${c.replace('storage/', '')})`;
+    if (c === 'permission-denied') return 'Not allowed — check Firestore rules';
+    return base;
+  };
 
   const app = useMemo(() => ({
     me, uid, items, members, modal, modalArg, toast,
@@ -169,7 +178,7 @@ function App({ me }) {
         if (file) { toast('Uploading photo…', 'camera'); photoURL = await window.S2.uploadPhoto(file, uid); }
         await window.S2.addItem({ name, desc, photoURL, groups: gids || [], ownerUid: uid, holderUid: null, takenAt: null });
         toast('Added to your shelf', 'box');
-      } catch (e) { console.error(e); toast('Could not add', 'x'); }
+      } catch (e) { console.error(e); toast(failMsg(e, 'Could not add'), 'x'); }
     },
     editItem: async (itemId, { name, desc, file, groups: gids }) => {
       closeAll();
@@ -178,7 +187,7 @@ function App({ me }) {
         if (file) { toast('Uploading photo…', 'camera'); patch.photoURL = await window.S2.uploadPhoto(file, uid); }
         await window.S2.updateItem(itemId, patch);
         toast('Saved', 'check');
-      } catch (e) { console.error(e); toast('Could not save', 'x'); }
+      } catch (e) { console.error(e); toast(failMsg(e, 'Could not save'), 'x'); }
     },
     deleteItem: async (itemId) => {
       if (!window.confirm('Remove this thing from your shelf?')) return;
