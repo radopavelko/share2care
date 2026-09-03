@@ -1,123 +1,64 @@
-# ShareKeep.Online
+# ShareKeep.online
 
-Share it out. Keep track. Buy less. Borrow, lend, sell, or give away everyday
-things within trusted groups — each group only sees what its members share.
+Share your things with people you trust, and always know who has what.
 
-- **Frontend:** static HTML/CSS/JS (React via CDN, compiled in-browser by Babel — no build step)
-- **Auth:** Firebase Authentication (Google sign-in)
-- **Database:** Cloud Firestore (live updates across devices)
-- **Photos:** Firebase Storage (uploads are downscaled in the browser first)
-- **Hosting:** Cloudflare Pages, deploying straight from GitHub
+- **Frontend:** static HTML/JS (React via CDN, compiled in-browser by Babel — no build step)
+- **Auth:** Firebase Authentication (Google sign-in; popup, with redirect fallback for home-screen apps)
+- **Database:** Cloud Firestore (live updates)
+- **Photos:** Firebase Storage (downscaled in the browser first)
+- **Hosting:** Cloudflare Pages, deploying from GitHub (`main` = production, every other branch gets a preview URL)
+- **Installable:** web-app manifest + Apple touch icon, so "Add to Home Screen" opens it full-screen like an app
 
-Works the same in desktop Chrome and in Chrome/Safari on iPhone and Android.
+## How it works
 
----
+- **Shelf** — everything shared with you: your own things plus items in the groups you belong to. Pick a group to see just that group.
+- **Who has what** — tap a thing and say *I've got it*; tap *I returned it* when it's back. Owners can also mark *Got it back*. No requests, no approvals — trust-based, one tap.
+- **Loans** — what you're holding, and which of your things are out.
+- **You** — your groups (create, join by link/code, invite by email) and your things.
 
-## Project layout
+## Files
 
 ```
-index.html          host page + responsive layout
-firebase-init.js    Firebase setup, exposes window.S2 (ES module)
-helpers.jsx         date helpers + categories
-theme.jsx           design tokens + shared UI components
-screens-browse.jsx  Shelf + item detail + borrow sheet
-screens-borrows.jsx My Loans + Profile
-screens-lend.jsx    Lend + add-item form (photo upload)
-app.jsx             auth gate, Firestore data layer, tab shell
-firestore.rules     Firestore security rules (paste into console)
-storage.rules       Storage security rules (paste into console)
-prototype/          original Claude design prototype (reference only)
+index.html            host page, layout, PWA meta
+manifest.webmanifest  installable web-app manifest (+ icon-*.png, apple-touch-icon.png)
+firebase-init.js      Firebase setup; exposes window.S2 (ES module)
+helpers.jsx           small utilities (holderOf, dates)
+theme.jsx             design tokens + shared UI components
+screens-browse.jsx    Shelf + item detail
+screens-borrows.jsx   Loans + You
+screens-lend.jsx      add / edit item sheets
+screens-groups.jsx    group switcher + create / join / manage sheets
+app.jsx               auth gate, data layer, actions, tabs
+firestore.rules       Firestore security rules (paste into console)
+storage.rules         Storage security rules (paste into console)
 ```
 
----
+## Firebase (one-time)
 
-## One-time Firebase setup (≈5 minutes)
+Console → project **share2care-7bb3a**:
+1. **Authentication → Sign-in method → Google → Enable.**
+2. **Firestore → Rules** → paste `firestore.rules` → Publish. **Storage → Rules** → paste `storage.rules` → Publish.
+3. **Authentication → Settings → Authorized domains** → add every domain the app is served from (`sharekeep.online`, `www.sharekeep.online`, `share2care.pages.dev`, and any `<branch>.share2care.pages.dev` you want to test sign-in on). `localhost` is included by default.
 
-Open the [Firebase console](https://console.firebase.google.com/) → project **share2care-7bb3a**.
+## Deploy
 
-### 1. Enable Google sign-in
-Build → **Authentication** → **Get started** → **Sign-in method** →
-**Google** → toggle **Enable** → pick a support email → **Save**.
+Push to `main` → Cloudflare Pages rebuilds production. Other branches get `https://<branch>.share2care.pages.dev`.
 
-### 2. Create the Firestore database
-Build → **Firestore Database** → **Create database** →
-**Start in production mode** → choose a location → **Enable**.
-Then open the **Rules** tab, replace everything with the contents of
-[`firestore.rules`](firestore.rules), and click **Publish**.
+**Custom domain** (`sharekeep.online`, bought at Namecheap): add the site in Cloudflare (Free plan) → set Namecheap nameservers to the two Cloudflare gives you → wait for *Active* → Pages project → **Custom domains** → add `sharekeep.online` and `www.sharekeep.online` → add both to Firebase Authorized domains.
 
-### 3. Enable Storage (for photos)
-Build → **Storage** → **Get started** → accept the default location.
-Then open the **Rules** tab, replace everything with the contents of
-[`storage.rules`](storage.rules), and click **Publish**.
+## Add to Home Screen (iPhone)
 
-### 4. Authorize your domains
-Authentication → **Settings** → **Authorized domains** → **Add domain**.
-Add your live site domain, e.g. `share2care.pages.dev` (and your custom domain
-if you add one later). `localhost` is already authorized for local testing.
-
-That's it — no keys to paste anywhere. The web config in `firebase-init.js` is
-public by design; access is controlled by the security rules above.
-
----
-
-## Deploy on Cloudflare Pages
-
-Your current Cloudflare project was created as a **Worker**, which is why the
-deploy fails. This app is a **static site**, so use **Pages** instead.
-
-1. Push this code to the GitHub repo (`radopavelko/share2care`, branch `main`).
-2. Cloudflare dashboard → **Workers & Pages** → **Create application** →
-   **Pages** → **Connect to Git** → pick `share2care`.
-3. Build settings:
-   - **Framework preset:** `None`
-   - **Build command:** *(leave empty)*
-   - **Build output directory:** `/`
-4. **Save and Deploy.** Cloudflare serves `index.html` from the repo root.
-5. Copy the live URL (e.g. `https://share2care.pages.dev`) and add it to
-   Firebase **Authorized domains** (step 4 above).
-
-> If the old Worker project is still attached to the repo, delete it
-> (its **Settings → Delete**) so it doesn't keep failing, then create the
-> Pages project as above. Every push to `main` now redeploys automatically.
-
-### Branch preview URLs (testing a branch)
-
-Pages builds **every branch**, not just `main`, so you can share a work-in-progress
-branch without touching production.
-
-- Settings → **Builds & deployments** → **Preview deployments** must be
-  **"All non-Production branches"** (the default).
-- After a branch is **pushed while the Pages project is connected**, Cloudflare
-  gives it a stable alias URL: `https://<branch>.<project>.pages.dev`
-  (e.g. `https://less-groups.share2care.pages.dev`). Find it under the
-  **Deployments** tab. Use the branch alias, not the per-commit hash URL.
-- A branch created *before* the Pages project was connected won't build until
-  its **next push** — push any commit to it to trigger the first preview build.
-- Add each preview domain you share to Firebase **Authorized domains** (Firebase
-  doesn't accept wildcards, so add the exact `<branch>.<project>.pages.dev`).
-
----
+Open the site in **Safari** → Share → **Add to Home Screen**. It then opens full-screen with the ShareKeep icon. (iOS only allows this from Safari; Chrome on iPhone can only add a plain bookmark.) On Android, Chrome offers *Install app* / *Add to Home screen* from its menu.
 
 ## Run locally
 
-The `.jsx` files are fetched and compiled in the browser, so you need to serve
-over HTTP (opening the file directly won't work):
+Serve over HTTP (the `.jsx` files are fetched and compiled in the browser):
 
 ```bash
 python3 -m http.server 8000
-# then open http://localhost:8000
 ```
 
-Google sign-in works on `localhost` out of the box.
+## Notes
 
----
-
-## Notes & possible next steps
-
-- **Group-scoped shelf:** the app only shows you your own items plus items
-  shared into groups you belong to ("All things" is the union of your groups).
-  Note this is enforced in the UI, not in the security rules — any signed-in
-  user can still technically read all data. Before opening the app to
-  strangers, tighten `firestore.rules` with per-group membership checks.
-- **Multiple groups, reminders/notifications, ratings** — all natural follow-ups
-  the data model can grow into.
+- Visibility is enforced in the UI: you only see your things and your groups' things. The Firestore rules still allow any signed-in user to read all data — tighten them with per-group membership checks before opening the app to strangers.
+- Items created by older versions (with `status`/`borrowerUid`) still work; `holderOf()` reads both shapes.

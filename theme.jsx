@@ -1,41 +1,26 @@
-// theme.jsx — ShareKeep.Online design tokens (light only: white / black /
-// Renault yellow with a subtle modern gradient) + shared presentational
-// components.
-//
-// Yellow is bright, so it can't be used as text on white. The split:
-//   accentGrad / accentBright → large & small fills (with dark onAccent text)
-//   accent (amber)            → accent text, icons, borders on light surfaces
+// theme.jsx — ShareKeep design tokens (minimal, Apple-like: yellow / black / grey)
+// + shared presentational components.
 
 const THEME = {
-  bg:         '#FAFAF8',
+  font:       "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', Inter, system-ui, sans-serif",
+  bg:         '#F4F4F2',
   surface:    '#FFFFFF',
-  surfaceAlt: '#F3F2EF',
+  surfaceAlt: '#EFEFED',
   ink:        '#111111',
-  inkSoft:    '#6B6B6B',
-  inkFaint:   '#9A9894',
-  line:       '#E2E0DC',
-  lineSoft:   '#ECEAE6',
-  accent:     '#B07A00',   // readable amber for accent text / icons / borders
-  accentBright:'#F5B400',  // solid bright yellow for small fills
-  accentGrad: 'linear-gradient(135deg, #FFD63D 0%, #F5B400 100%)', // big fills
-  onAccent:   '#1A1300',   // text / icons sitting on a yellow fill
-  accentDeep: '#8A6000',   // accent text on the soft tint
-  accentSoft: '#FFF4D6',
-  good:       '#3B6D11',
-  goodSoft:   '#E9F2E6',
-  warn:       '#B07A2E',
-  over:       '#B5211C',
-  neutralSoft:'#EAE9E6',
-  dangerSoft: '#FDF1F0',
-  dangerLine: '#F3C9C6',
-  disabledBg: '#E2DECF',
-  toastBg:    '#111111',
-  tagBg:      'rgba(255,255,255,0.82)',
-  thumbDot:   'rgba(255,255,255,0.6)',
-  thumbShape: 'rgba(255,255,255,0.55)',
-  btnContrast:'#111111',
-  btnContrastFg:'#FFFFFF',
-  shadow:     '0 1px 2px rgba(0,0,0,0.04), 0 8px 22px rgba(0,0,0,0.06)',
+  inkSoft:    '#6E6E73',
+  inkFaint:   '#A3A3A8',
+  line:       '#E4E4E2',
+  lineSoft:   '#EEEEEC',
+  accent:     '#FFC300',                                              // solid yellow (small fills, dots)
+  accentGrad: 'linear-gradient(135deg, #FFD84D 0%, #FFC300 100%)',    // big fills
+  onAccent:   '#1A1300',                                              // text on yellow
+  accentText: '#9A7400',                                              // yellow as *text* on light
+  accentSoft: '#FFF5CC',
+  good:       '#2E7D32',
+  goodSoft:   '#E6F3E7',
+  over:       '#C62828',
+  dangerSoft: '#FDECEC',
+  shadow:     '0 1px 2px rgba(0,0,0,0.04), 0 6px 18px rgba(0,0,0,0.05)',
   shadowSm:   '0 1px 2px rgba(0,0,0,0.04)',
 };
 
@@ -49,208 +34,106 @@ function Icon({ name, size = 22, color = 'currentColor', stroke = 2 }) {
     back:    <><path d="M15 5l-7 7 7 7" {...p} /></>,
     check:   <><path d="M4 12l5 5L20 6" {...p} /></>,
     x:       <><path d="M6 6l12 12M18 6L6 18" {...p} /></>,
-    clock:   <><circle cx="12" cy="12" r="8" {...p} /><path d="M12 8v4l3 2" {...p} /></>,
-    pin:     <><path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z" {...p} /><circle cx="12" cy="10" r="2.4" {...p} /></>,
     chevron: <><path d="M9 6l6 6-6 6" {...p} /></>,
     camera:  <><path d="M4 8h3l1.5-2h7L17 8h3v11H4z" {...p} /><circle cx="12" cy="13" r="3.4" {...p} /></>,
-    arrowOut:<><path d="M5 12h13M13 6l6 6-6 6" {...p} /></>,
-    arrowIn: <><path d="M19 12H6M11 6l-6 6 6 6" {...p} /></>,
-    bell:    <><path d="M6 9a6 6 0 0112 0c0 5 2 6 2 6H4s2-1 2-6z" {...p} /><path d="M10 20a2 2 0 004 0" {...p} /></>,
-    heart:   <><path d="M12 20S4 14.5 4 9.2A4.2 4.2 0 0112 6a4.2 4.2 0 018 3.2C20 14.5 12 20 12 20z" {...p} /></>,
     box:     <><path d="M4 8l8-4 8 4-8 4-8-4zM4 8v8l8 4 8-4V8M12 12v8" {...p} /></>,
     logout:  <><path d="M15 12H4M11 6l-6 6 6 6" {...p} /><path d="M14 4h5v16h-5" {...p} /></>,
     users:   <><circle cx="9" cy="8" r="3.4" {...p} /><path d="M3.5 19c1-3.2 3.4-4.2 5.5-4.2s4.5 1 5.5 4.2" {...p} /><path d="M16 5.2a3.2 3.2 0 010 5.8M17.5 14.6c1.8.5 3.2 1.7 4 4.4" {...p} /></>,
-    tools:   <><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" {...p} /></>,
-    home:    <><path d="M4 11.5L12 4l8 7.5" {...p} /><path d="M6.5 10v9.5h11V10" {...p} /></>,
-    tree:    <><path d="M3 18.5l5.5-9 3.6 5.8 2.4-3.6 6 6.8H3z" {...p} /><circle cx="17.5" cy="6" r="1.8" {...p} /></>,
-    screen:  <><rect x="3.5" y="5" width="17" height="11.5" rx="2" {...p} /><path d="M9.5 20h5M12 16.5V20" {...p} /></>,
-    dots:    <><circle cx="5.5" cy="12" r="1.4" {...p} /><circle cx="12" cy="12" r="1.4" {...p} /><circle cx="18.5" cy="12" r="1.4" {...p} /></>,
-    gift:    <><rect x="4" y="9.5" width="16" height="10" rx="1.8" {...p} /><path d="M4 13.5h16M12 9.5v10" {...p} /><path d="M12 9.5c-1.6 0-4.3-.6-4.3-2.7 0-1.7 2-2.2 3-1.2s1.3 3.9 1.3 3.9zM12 9.5c1.6 0 4.3-.6 4.3-2.7 0-1.7-2-2.2-3-1.2S12 9.5 12 9.5z" {...p} /></>,
-    tag:     <><path d="M20.2 12.6L12.6 20.2a1.8 1.8 0 01-2.5 0L3.5 13.6V5a1.5 1.5 0 011.5-1.5h8.6l6.6 6.6a1.8 1.8 0 010 2.5z" {...p} /><circle cx="8.3" cy="8.3" r="1.5" {...p} /></>,
-    edit:    <><path d="M4 20h4.5L19 9.5 14.5 5 4 15.5V20z" {...p} /><path d="M12.5 7l4.5 4.5" {...p} /></>,
     link:    <><path d="M9.5 13.5l5-5M8 11l-2 2a3.2 3.2 0 004.5 4.5l2-2M16 13l2-2A3.2 3.2 0 0013.5 6.5l-2 2" {...p} /></>,
     mail:    <><rect x="3.5" y="5.5" width="17" height="13" rx="2.5" {...p} /><path d="M4 7l8 5.5L20 7" {...p} /></>,
     copy:    <><rect x="9" y="9" width="11" height="11" rx="2.5" {...p} /><path d="M5 15H4.5A1.5 1.5 0 013 13.5v-9A1.5 1.5 0 014.5 3h9A1.5 1.5 0 0115 4.5V5" {...p} /></>,
     trash:   <><path d="M5 7h14M9 7V5h6v2M7 7l1 12h8l1-12" {...p} /></>,
+    edit:    <><path d="M4 20h4.5L19 9.5 14.5 5 4 15.5V20z" {...p} /><path d="M12.5 7l4.5 4.5" {...p} /></>,
     repeat:  <><path d="M17 2l4 4-4 4" {...p} /><path d="M3 11V9a4 4 0 014-4h14" {...p} /><path d="M7 22l-4-4 4-4" {...p} /><path d="M21 13v2a4 4 0 01-4 4H3" {...p} /></>,
-    sun:     <><circle cx="12" cy="12" r="4" {...p} /><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8" {...p} /></>,
-    moon:    <><path d="M20 13.5A8 8 0 1110.5 4a6.5 6.5 0 009.5 9.5z" {...p} /></>,
+    hand:    <><path d="M7 11.5V6.5a1.5 1.5 0 013 0V11M10 10V4.5a1.5 1.5 0 013 0V11M13 10.5V5.5a1.5 1.5 0 013 0v6.5M16 12V8.5a1.5 1.5 0 013 0V15a6 6 0 01-6 6h-1.5a6 6 0 01-5-2.7L3.6 14.4a1.5 1.5 0 012.4-1.8L7 14" {...p} /></>,
   };
   return <svg width={size} height={size} viewBox="0 0 24 24" style={{ display: 'block' }}>{paths[name]}</svg>;
 }
 
-// ShareKeep logo: yellow gradient tile with the box (your stuff) and a small
-// loop arrow — it goes out and comes back.
-function BrandMark({ size = 76 }) {
-  const badge = Math.round(size * 0.38);
-  return (
-    <div style={{
-      width: size, height: size, borderRadius: size * 0.29, background: THEME.accentGrad,
-      display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative',
-      boxShadow: '0 8px 24px rgba(245,180,0,0.34)', flexShrink: 0,
-    }}>
-      <Icon name="box" size={size * 0.5} color={THEME.onAccent} />
-      <div style={{
-        position: 'absolute', right: -badge * 0.26, bottom: -badge * 0.26,
-        width: badge, height: badge, borderRadius: '50%', background: '#111111',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: `0 0 0 2.5px ${THEME.bg}`,
-      }}>
-        <Icon name="repeat" size={badge * 0.56} color="#fff" stroke={2.4} />
-      </div>
-    </div>
-  );
-}
-
-// SHAREKEEP.ONLINE wordmark — black with the .ONLINE in the accent.
-function Wordmark({ size = 30 }) {
-  return (
-    <div style={{
-      fontFamily: 'Archivo Black, sans-serif', fontSize: size, color: THEME.ink,
-      letterSpacing: -0.5, lineHeight: 1, whiteSpace: 'nowrap',
-    }}>
-      SHAREKEEP<span style={{ color: THEME.accent }}>.ONLINE</span>
-    </div>
-  );
-}
-
-// Avatar — shows the member's Google photo when available, else initials on a warm tint.
-// Resolves a string uid against the live MEMBERS map, or takes a user object directly,
-// so the same person renders identically everywhere (shelf, profile, cards).
+// Avatar — Google photo when available, else an initial on the member's colour.
 function Avatar({ user, size = 40, ring = false }) {
   const u = typeof user === 'string' ? window.MEMBERS[user] : user;
   if (!u) return null;
-  const ringStyle = ring ? `0 0 0 2.5px ${THEME.surface}, 0 0 0 4px ${(u.color || THEME.accent)}33` : 'none';
+  const ringStyle = ring ? `0 0 0 2px ${THEME.surface}` : 'none';
   const initials = (
     <div style={{
       width: size, height: size, borderRadius: '50%', flexShrink: 0,
-      background: u.color || THEME.accent, color: '#fff',
+      background: u.color || THEME.ink, color: '#fff',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontFamily: 'Archivo Black, sans-serif', fontWeight: 600,
-      fontSize: size * 0.4, letterSpacing: 0.2,
+      fontFamily: THEME.font, fontWeight: 600, fontSize: size * 0.42,
       boxShadow: ringStyle, userSelect: 'none',
     }}>{(u.name || '?')[0]}</div>
   );
   if (!u.photoURL) return initials;
-  // Keyed by the photo URL so each person's image is isolated (no stale/“swapped”
-  // pixels carried over when a slot re-renders for a different member), and so the
-  // failure state resets when the URL changes.
   return <AvatarPhoto key={u.photoURL} src={u.photoURL} alt={u.name || ''} size={size} ringStyle={ringStyle} fallback={initials} />;
 }
-
 function AvatarPhoto({ src, alt, size, ringStyle, fallback }) {
   const [failed, setFailed] = React.useState(false);
   if (failed) return fallback;
   return (
-    <img src={src} alt={alt} referrerPolicy="no-referrer"
-      onError={() => setFailed(true)}
-      style={{
-        width: size, height: size, borderRadius: '50%', flexShrink: 0, objectFit: 'cover',
-        boxShadow: ringStyle, userSelect: 'none', display: 'block',
-      }} />
+    <img src={src} alt={alt} referrerPolicy="no-referrer" onError={() => setFailed(true)}
+      style={{ width: size, height: size, borderRadius: '50%', flexShrink: 0, objectFit: 'cover', boxShadow: ringStyle, userSelect: 'none', display: 'block' }} />
   );
 }
 
-// Category thumbnail — shows the uploaded photo when present, else a warm placeholder tile.
-function ItemThumb({ item, height = 132, radius = 16 }) {
-  const cat = window.normCat(item.cat);
-  const meta = window.CAT_META[cat] || { tint: '#F3F2EF', shape: 'circle' };
-  const market = window.marketInfo(item);
-  const showTag = height >= 78;
-  const shapeStyle = {
-    position: 'absolute', width: '52%', aspectRatio: '1',
-    background: THEME.thumbShape,
-    boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.03)',
-    right: '-8%', bottom: '-14%',
-  };
-  const shapes = {
-    circle: { ...shapeStyle, borderRadius: '50%' },
-    square: { ...shapeStyle, borderRadius: 18, transform: 'rotate(-8deg)' },
-    diamond:{ ...shapeStyle, borderRadius: 10, transform: 'rotate(45deg)', right: '4%', bottom: '-6%', width: '40%' },
-  };
+// Item photo, or a quiet grey tile with a box glyph.
+function ItemThumb({ item, height = 120, radius = 14 }) {
   return (
-    <div style={{
-      position: 'relative', width: '100%', height, borderRadius: radius,
-      background: meta.tint, overflow: 'hidden', flexShrink: 0,
-      backgroundImage: `radial-gradient(${THEME.thumbDot} 1px, transparent 1.4px)`,
-      backgroundSize: '12px 12px',
-    }}>
-      <div style={shapes[meta.shape]} />
+    <div style={{ position: 'relative', width: '100%', height, borderRadius: radius, background: THEME.surfaceAlt, overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Icon name="box" size={Math.max(20, height * 0.32)} color={THEME.inkFaint} stroke={1.6} />
       {item.photoURL && (
         <img src={item.photoURL} alt={item.name} loading="lazy"
           onError={e => { e.currentTarget.style.display = 'none'; }}
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
       )}
-      {showTag && (
-        <div style={{
-          position: 'absolute', top: 10, left: 10, zIndex: 2,
-          display: 'flex', alignItems: 'center', gap: 4,
-          fontFamily: 'Inter, sans-serif', fontSize: 10.5, letterSpacing: 0.3,
-          textTransform: 'lowercase', color: meta.chip || THEME.inkSoft,
-          background: THEME.tagBg, padding: '3px 7px', borderRadius: 6,
-          backdropFilter: 'blur(2px)',
-        }}>
-          {meta.icon && <Icon name={meta.icon} size={11} color={meta.chip || THEME.inkSoft} />}
-          {cat}
-        </div>
-      )}
-      {showTag && market && (
-        <div style={{
-          position: 'absolute', top: 10, right: 10, zIndex: 2,
-          display: 'flex', alignItems: 'center', gap: 4,
-          background: market.badgeBg, color: market.badgeFg, padding: '3px 8px', borderRadius: 999,
-          fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap',
-        }}>
-          <Icon name={market.icon} size={11} color={market.badgeFg} />
-          {market.label}
-        </div>
-      )}
     </div>
   );
 }
 
-function StatusBadge({ status, due, small = false }) {
-  let bg = THEME.goodSoft, fg = THEME.good, label = 'Available', dot = THEME.good;
-  if (status === 'pending') { bg = THEME.accentSoft; fg = THEME.accentDeep; label = 'Requested'; dot = THEME.accent; }
-  else if (status === 'gone') { bg = THEME.neutralSoft; fg = THEME.inkSoft; label = 'Taken'; dot = THEME.inkFaint; }
-  else if (status === 'out') {
-    const r = due ? window.relativeDue(due) : null;
-    bg = THEME.neutralSoft; fg = THEME.inkSoft; dot = THEME.inkFaint; label = 'On loan';
-    if (r && r.tone === 'over') { fg = THEME.over; dot = THEME.over; }
-  }
+// Small status pill. tone: 'grey' | 'yellow' | 'green'
+function Pill({ tone = 'grey', children, small = false }) {
+  const tones = {
+    grey:   { bg: THEME.surfaceAlt, fg: THEME.inkSoft },
+    yellow: { bg: THEME.accentSoft, fg: THEME.accentText },
+    green:  { bg: THEME.goodSoft, fg: THEME.good },
+  };
+  const t = tones[tone] || tones.grey;
   return (
     <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 6,
-      background: bg, color: fg, borderRadius: 999,
-      padding: small ? '3px 9px' : '5px 11px',
-      fontSize: small ? 11.5 : 12.5, fontWeight: 600,
-      fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap',
-    }}>
-      <span style={{ width: 6, height: 6, borderRadius: '50%', background: dot }} />
-      {label}
-    </span>
+      display: 'inline-flex', alignItems: 'center', gap: 5, background: t.bg, color: t.fg,
+      borderRadius: 999, padding: small ? '3px 9px' : '5px 11px', fontSize: small ? 11.5 : 12.5,
+      fontWeight: 600, fontFamily: THEME.font, whiteSpace: 'nowrap',
+    }}>{children}</span>
   );
+}
+
+// Status of an item relative to the viewer.
+function StatusPill({ item, uid, small }) {
+  const h = window.holderOf(item);
+  if (!h) return <Pill tone="green" small={small}>Available</Pill>;
+  if (h === uid) return <Pill tone="yellow" small={small}>You have it</Pill>;
+  const m = window.MEMBERS[h];
+  return <Pill tone="yellow" small={small}>With {m ? m.name : 'someone'}</Pill>;
 }
 
 function Btn({ children, onClick, variant = 'primary', full = false, size = 'md', disabled = false, style = {} }) {
   const sizes = { sm: { pad: '9px 14px', fs: 14 }, md: { pad: '13px 18px', fs: 15.5 }, lg: { pad: '16px 20px', fs: 16.5 } };
   const s = sizes[size];
   const variants = {
-    primary: { background: disabled ? THEME.disabledBg : THEME.accentGrad, color: disabled ? '#fff' : THEME.onAccent, border: 'none', boxShadow: disabled ? 'none' : '0 2px 10px rgba(245,180,0,0.34)' },
-    soft:    { background: THEME.accentSoft, color: THEME.accentDeep, border: 'none' },
-    ghost:   { background: THEME.surface, color: THEME.ink, border: `1.5px solid ${THEME.line}` },
-    danger:  { background: THEME.dangerSoft, color: THEME.over, border: `1.5px solid ${THEME.dangerLine}` },
-    good:    { background: THEME.good, color: '#fff', border: 'none', boxShadow: '0 2px 10px rgba(59,109,17,0.28)' },
-    dark:    { background: THEME.btnContrast, color: THEME.btnContrastFg, border: 'none' },
+    primary: { background: disabled ? THEME.surfaceAlt : THEME.accentGrad, color: disabled ? THEME.inkFaint : THEME.onAccent, border: 'none' },
+    dark:    { background: THEME.ink, color: '#fff', border: 'none' },
+    soft:    { background: THEME.surfaceAlt, color: THEME.ink, border: 'none' },
+    ghost:   { background: THEME.surface, color: THEME.ink, border: `1px solid ${THEME.line}` },
+    danger:  { background: THEME.dangerSoft, color: THEME.over, border: 'none' },
   };
   const v = variants[variant] || variants.primary;
   return (
     <button onClick={disabled ? undefined : onClick} disabled={disabled} style={{
       ...v, padding: s.pad, fontSize: s.fs, width: full ? '100%' : 'auto',
-      fontFamily: 'Inter, sans-serif', fontWeight: 600, borderRadius: 14,
+      fontFamily: THEME.font, fontWeight: 600, borderRadius: 14,
       cursor: disabled ? 'default' : 'pointer', display: 'inline-flex',
       alignItems: 'center', justifyContent: 'center', gap: 8, whiteSpace: 'nowrap',
-      transition: 'transform .12s ease, filter .12s ease', WebkitTapHighlightColor: 'transparent',
+      transition: 'transform .12s ease, opacity .12s ease', WebkitTapHighlightColor: 'transparent',
       ...style,
     }}
     onMouseDown={e => { if (!disabled) e.currentTarget.style.transform = 'scale(0.97)'; }}
@@ -264,10 +147,9 @@ function Btn({ children, onClick, variant = 'primary', full = false, size = 'md'
 function Card({ children, onClick, style = {}, pad = 0 }) {
   return (
     <div onClick={onClick} style={{
-      background: THEME.surface, borderRadius: 20, boxShadow: THEME.shadowSm,
-      border: `1px solid ${THEME.lineSoft}`, padding: pad, overflow: 'hidden',
-      cursor: onClick ? 'pointer' : 'default',
-      transition: 'transform .14s ease, box-shadow .14s ease', ...style,
+      background: THEME.surface, borderRadius: 18, border: `1px solid ${THEME.lineSoft}`,
+      boxShadow: THEME.shadowSm, padding: pad, overflow: 'hidden',
+      cursor: onClick ? 'pointer' : 'default', transition: 'transform .14s ease', ...style,
     }}
     onMouseDown={onClick ? (e => e.currentTarget.style.transform = 'scale(0.985)') : undefined}
     onMouseUp={onClick ? (e => e.currentTarget.style.transform = 'scale(1)') : undefined}
@@ -281,20 +163,17 @@ function Sheet({ open, onClose, children, title }) {
   if (!open) return null;
   return (
     <div onClick={onClose} style={{
-      position: 'absolute', inset: 0, zIndex: 200,
-      background: 'rgba(40,32,24,0.42)', backdropFilter: 'blur(2px)',
-      display: 'flex', alignItems: 'flex-end', animation: 'fadeIn .22s ease both',
+      position: 'absolute', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.32)',
+      display: 'flex', alignItems: 'flex-end', animation: 'fadeIn .2s ease both',
     }}>
       <div onClick={e => e.stopPropagation()} style={{
-        width: '100%', background: THEME.surface,
-        borderRadius: '26px 26px 0 0', padding: '12px 20px 0',
-        animation: 'sheetUp .3s cubic-bezier(.16,1,.3,1) both',
-        maxHeight: '86%', overflowY: 'auto', boxShadow: '0 -10px 40px rgba(40,30,20,0.18)',
+        width: '100%', background: THEME.surface, borderRadius: '24px 24px 0 0', padding: '12px 20px 0',
+        animation: 'sheetUp .3s cubic-bezier(.16,1,.3,1) both', maxHeight: '88%', overflowY: 'auto',
       }}>
-        <div style={{ width: 38, height: 5, borderRadius: 99, background: THEME.line, margin: '0 auto 14px' }} />
-        {title && <div style={{ fontFamily: 'Archivo Black, sans-serif', fontWeight: 600, fontSize: 21, color: THEME.ink, marginBottom: 14 }}>{title}</div>}
+        <div style={{ width: 36, height: 5, borderRadius: 99, background: THEME.line, margin: '0 auto 14px' }} />
+        {title && <div style={{ fontFamily: THEME.font, fontWeight: 700, fontSize: 20, color: THEME.ink, letterSpacing: -0.3, marginBottom: 14 }}>{title}</div>}
         {children}
-        <div style={{ height: 24 }} />
+        <div style={{ height: 'max(24px, env(safe-area-inset-bottom))' }} />
       </div>
     </div>
   );
@@ -304,16 +183,70 @@ function Toast({ toast }) {
   if (!toast) return null;
   return (
     <div style={{
-      position: 'absolute', left: 16, right: 16, bottom: 104, zIndex: 300,
-      background: THEME.toastBg, color: '#fff', borderRadius: 16,
-      padding: '13px 16px', display: 'flex', alignItems: 'center', gap: 11,
-      fontFamily: 'Inter, sans-serif', fontSize: 14.5, fontWeight: 500,
-      boxShadow: '0 8px 28px rgba(0,0,0,0.28)', animation: 'toastIn .32s cubic-bezier(.16,1,.3,1) both',
+      position: 'absolute', left: 16, right: 16, bottom: 100, zIndex: 300,
+      background: THEME.ink, color: '#fff', borderRadius: 14, padding: '12px 16px',
+      display: 'flex', alignItems: 'center', gap: 10, fontFamily: THEME.font, fontSize: 14.5, fontWeight: 500,
+      boxShadow: '0 8px 28px rgba(0,0,0,0.22)', animation: 'toastIn .3s cubic-bezier(.16,1,.3,1) both',
     }}>
-      {toast.icon && <span style={{ color: THEME.accent, display: 'flex' }}><Icon name={toast.icon} size={19} /></span>}
+      {toast.icon && <span style={{ color: THEME.accent, display: 'flex' }}><Icon name={toast.icon} size={18} /></span>}
       <span style={{ flex: 1 }}>{toast.msg}</span>
     </div>
   );
 }
 
-Object.assign(window, { THEME, Icon, Avatar, ItemThumb, StatusBadge, Btn, Card, Sheet, Toast, BrandMark, Wordmark });
+// Form helpers
+function Field({ label, children }) {
+  return (
+    <div style={{ marginBottom: 18 }}>
+      <div style={{ fontFamily: THEME.font, fontWeight: 600, fontSize: 13.5, color: THEME.inkSoft, marginBottom: 8 }}>{label}</div>
+      {children}
+    </div>
+  );
+}
+function inputStyle(T) {
+  return {
+    width: '100%', boxSizing: 'border-box', border: `1px solid ${T.line}`, borderRadius: 13,
+    padding: '13px 14px', fontFamily: T.font, fontSize: 16, color: T.ink, outline: 'none', background: T.surfaceAlt,
+  };
+}
+function SectionLabel({ children, count }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, padding: '0 2px 10px' }}>
+      <span style={{ fontFamily: THEME.font, fontSize: 13, fontWeight: 600, color: THEME.inkSoft }}>{children}</span>
+      {count != null && <span style={{ fontFamily: THEME.font, fontSize: 12.5, color: THEME.inkFaint }}>{count}</span>}
+    </div>
+  );
+}
+function EmptyHint({ text }) {
+  return (
+    <div style={{ fontFamily: THEME.font, fontSize: 14, color: THEME.inkFaint, padding: '14px 16px', background: THEME.surface, borderRadius: 14, border: `1px dashed ${THEME.line}`, textWrap: 'pretty' }}>{text}</div>
+  );
+}
+
+// Logo: yellow gradient tile with the box + loop badge.
+function BrandMark({ size = 76 }) {
+  const badge = Math.round(size * 0.38);
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: size * 0.27, background: THEME.accentGrad,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', flexShrink: 0,
+    }}>
+      <Icon name="box" size={size * 0.5} color={THEME.onAccent} />
+      <div style={{
+        position: 'absolute', right: -badge * 0.24, bottom: -badge * 0.24, width: badge, height: badge, borderRadius: '50%',
+        background: THEME.ink, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 0 2.5px ${THEME.bg}`,
+      }}>
+        <Icon name="repeat" size={badge * 0.54} color="#fff" stroke={2.4} />
+      </div>
+    </div>
+  );
+}
+function Wordmark({ size = 26 }) {
+  return (
+    <div style={{ fontFamily: THEME.font, fontWeight: 800, fontSize: size, color: THEME.ink, letterSpacing: -0.8, lineHeight: 1, whiteSpace: 'nowrap' }}>
+      ShareKeep<span style={{ color: THEME.accentText }}>.online</span>
+    </div>
+  );
+}
+
+Object.assign(window, { THEME, Icon, Avatar, ItemThumb, Pill, StatusPill, Btn, Card, Sheet, Toast, Field, inputStyle, SectionLabel, EmptyHint, BrandMark, Wordmark });

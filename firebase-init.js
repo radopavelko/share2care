@@ -7,13 +7,12 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
-  getAuth, GoogleAuthProvider, signInWithPopup, signOut,
-  onAuthStateChanged,
+  getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect,
+  getRedirectResult, signOut, onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
-  getFirestore, collection, doc, getDoc, setDoc, addDoc, updateDoc,
-  onSnapshot, query, orderBy, serverTimestamp, runTransaction,
-  arrayUnion, arrayRemove,
+  getFirestore, collection, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc,
+  onSnapshot, query, orderBy, serverTimestamp, arrayUnion, arrayRemove,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
   getStorage, ref as storageRef, uploadBytes, getDownloadURL,
@@ -33,6 +32,29 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 const provider = new GoogleAuthProvider();
+provider.setCustomParameters({ prompt: "select_account" });
+
+// Home-screen web apps on iOS can't open popups, so sign in via redirect there.
+const isStandalone = () =>
+  (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) ||
+  window.navigator.standalone === true;
+
+// Popup first (works on desktop and in mobile browsers); if the environment
+// blocks it, fall back to the redirect flow.
+async function signIn() {
+  if (isStandalone()) return signInWithRedirect(auth, provider);
+  try {
+    return await signInWithPopup(auth, provider);
+  } catch (e) {
+    const c = e && e.code;
+    if (c === "auth/popup-blocked" || c === "auth/operation-not-supported-in-this-environment") {
+      return signInWithRedirect(auth, provider);
+    }
+    throw e;
+  }
+}
+// Complete a redirect sign-in if we're returning from one.
+getRedirectResult(auth).catch((e) => console.error("redirect sign-in", e));
 
 // Deterministic brand colour from a uid, so each member gets a stable avatar tint.
 const AVATAR_COLORS = [
@@ -105,24 +127,17 @@ window.S2 = {
   ready: false,
 
   // auth
-  signIn: () => signInWithPopup(auth, provider),
+  signIn,
   signOut: () => signOut(auth),
   onAuth: (cb) => onAuthStateChanged(auth, cb),
   ensureUserDoc,
   currentUid: () => (auth.currentUser ? auth.currentUser.uid : null),
-  // first-run intro pages: remember (per user) that they've been seen
-  markOnboarded: (uid) => updateDoc(doc(db, "users", uid), { onboarded: true }),
 
   // live subscriptions — return an unsubscribe function
   subItems: (cb) => onSnapshot(
     query(collection(db, "items"), orderBy("createdAt", "desc")),
     (snap) => cb(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
     (err) => console.error("subItems", err)
-  ),
-  subRequests: (cb) => onSnapshot(
-    query(collection(db, "requests"), orderBy("createdAt", "desc")),
-    (snap) => cb(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
-    (err) => console.error("subRequests", err)
   ),
   subUsers: (cb) => onSnapshot(
     collection(db, "users"),
@@ -169,18 +184,7 @@ window.S2 = {
     ...data, createdAt: serverTimestamp(),
   }),
   updateItem: (id, patch) => updateDoc(doc(db, "items", id), patch),
-  addRequest: (data) => addDoc(collection(db, "requests"), {
-    ...data, createdAt: serverTimestamp(),
-  }),
-  updateRequest: (id, patch) => updateDoc(doc(db, "requests", id), patch),
-
-  // borrow request + item flip done atomically
-  approveRequest: async (reqId, itemId, borrowerUid, due) => {
-    await runTransaction(db, async (tx) => {
-      tx.update(doc(db, "requests", reqId), { status: "approved" });
-      tx.update(doc(db, "items", itemId), { status: "out", borrowerUid, due });
-    });
-  },
+  deleteItem: (id) => deleteDoc(doc(db, "items", id)),
 
   // photo upload → returns a download URL
   uploadPhoto: async (file, uid) => {
