@@ -34,7 +34,7 @@ function BorrowsScreen({ app }) {
 
   return (
     <div style={{ paddingBottom: 120 }}>
-      <div style={{ padding: '54px 20px 16px' }}>
+      <div style={{ padding: 'max(54px, calc(env(safe-area-inset-top, 0px) + 20px)) 20px 16px' }}>
         <div style={{ fontFamily: T.font, fontWeight: 800, fontSize: 30, color: T.ink, letterSpacing: -0.8 }}>Loans</div>
         <div style={{ fontFamily: T.font, fontSize: 13.5, color: T.inkSoft, marginTop: 2 }}>Who has what right now</div>
       </div>
@@ -98,7 +98,7 @@ function ProfileScreen({ app }) {
 
   return (
     <div style={{ paddingBottom: 120 }}>
-      <div style={{ padding: '60px 20px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+      <div style={{ padding: 'max(60px, calc(env(safe-area-inset-top, 0px) + 24px)) 20px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
         <window.Avatar user={me} size={80} />
         <div style={{ fontFamily: T.font, fontWeight: 800, fontSize: 22, color: T.ink, marginTop: 12, letterSpacing: -0.5 }}>{me.full}</div>
         {me.email && <div style={{ fontFamily: T.font, fontSize: 14, color: T.inkSoft, marginTop: 3 }}>{me.email}</div>}

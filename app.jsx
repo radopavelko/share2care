@@ -107,7 +107,7 @@ function App({ me }) {
   const toast = (msg, icon) => {
     setToastData({ msg, icon, k: Date.now() });
     if (toastTimer.current) clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToastData(null), Math.max(2600, String(msg).length * 55));
+    toastTimer.current = setTimeout(() => setToastData(null), Math.max(2200, String(msg).length * 55));
   };
   const closeAll = () => { setModal(null); setModalArg(null); };
 

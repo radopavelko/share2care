@@ -191,17 +191,21 @@ function Sheet({ open, onClose, children, title }) {
   );
 }
 
+// Notification banner: a small pill at the top, out of the way of buttons,
+// sheets and the tab bar. Non-interactive, so taps pass through.
 function Toast({ toast }) {
   if (!toast) return null;
   return (
-    <div style={{
-      position: 'absolute', left: 16, right: 16, bottom: 100, zIndex: 300,
-      background: THEME.ink, color: '#fff', borderRadius: 14, padding: '12px 16px',
-      display: 'flex', alignItems: 'center', gap: 10, fontFamily: THEME.font, fontSize: 14.5, fontWeight: 500,
-      boxShadow: '0 8px 28px rgba(0,0,0,0.22)', animation: 'toastIn .3s cubic-bezier(.16,1,.3,1) both',
-    }}>
-      {toast.icon && <span style={{ color: THEME.accent, display: 'flex' }}><Icon name={toast.icon} size={18} /></span>}
-      <span style={{ flex: 1 }}>{toast.msg}</span>
+    <div style={{ position: 'absolute', left: 0, right: 0, top: 'max(10px, calc(env(safe-area-inset-top, 0px) + 8px))', zIndex: 400, display: 'flex', justifyContent: 'center', pointerEvents: 'none' }}>
+      <div key={toast.k} style={{
+        display: 'inline-flex', alignItems: 'center', gap: 9, maxWidth: 'calc(100% - 130px)', textAlign: 'center',
+        background: THEME.ink, color: '#fff', borderRadius: 999, padding: '10px 16px 10px 13px',
+        fontFamily: THEME.font, fontSize: 14, fontWeight: 500, lineHeight: 1.35,
+        boxShadow: '0 8px 24px rgba(0,0,0,0.18)', animation: 'toastDown .32s cubic-bezier(.16,1,.3,1) both',
+      }}>
+        {toast.icon && <span style={{ color: THEME.accent, display: 'flex', flexShrink: 0 }}><Icon name={toast.icon} size={17} /></span>}
+        <span>{toast.msg}</span>
+      </div>
     </div>
   );
 }

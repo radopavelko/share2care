@@ -75,7 +75,7 @@ function BrowseScreen({ app }) {
 
   return (
     <div style={{ paddingBottom: 120 }}>
-      <div style={{ padding: '54px 20px 8px' }}>
+      <div style={{ padding: 'max(54px, calc(env(safe-area-inset-top, 0px) + 20px)) 20px 8px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <window.GroupSwitcher app={app} />
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -157,15 +157,15 @@ function ItemDetail({ app, item }) {
   return (
     <div style={{ position: 'absolute', inset: 0, background: T.bg, zIndex: 150, overflowY: 'auto', animation: 'screenIn .26s cubic-bezier(.16,1,.3,1) both' }}>
       <div style={{ position: 'relative', padding: '8px 8px 0' }}>
-        <window.ItemThumb item={item} height={460} radius={20} auto />
+        <window.ItemThumb item={item} height={item.photoURL ? 420 : 200} radius={20} auto />
         <button onClick={app.closeItem} style={{
-          position: 'absolute', top: 52, left: 20, width: 38, height: 38, borderRadius: '50%',
+          position: 'absolute', top: 'max(52px, calc(env(safe-area-inset-top, 0px) + 14px))', left: 20, width: 38, height: 38, borderRadius: '50%',
           background: 'rgba(255,255,255,0.92)', border: 'none', cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
         }}><window.Icon name="back" size={20} color={T.ink} /></button>
         {isMine && (
           <button onClick={() => app.openModal('editItem', item.id)} style={{
-            position: 'absolute', top: 52, right: 20, height: 38, padding: '0 14px', borderRadius: 19,
+            position: 'absolute', top: 'max(52px, calc(env(safe-area-inset-top, 0px) + 14px))', right: 20, height: 38, padding: '0 14px', borderRadius: 19,
             background: 'rgba(255,255,255,0.92)', border: 'none', cursor: 'pointer',
             display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
             fontFamily: T.font, fontWeight: 600, fontSize: 14, color: T.ink,
