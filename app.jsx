@@ -16,7 +16,7 @@ function SignIn({ onSignIn, error }) {
       <img src="logo.png" alt="ShareKeep" style={{ width: 150, height: 'auto', display: 'block', marginBottom: 22, userSelect: 'none' }} />
       <window.Wordmark size={27} />
       <div style={{ fontFamily: T.font, fontSize: 16, color: T.inkSoft, marginTop: 12, maxWidth: 280, lineHeight: 1.5, textWrap: 'pretty' }}>
-        Share with care. Keep with trust.<br />Track it online.
+“Share with care. Keep with trust.”<br />Your simple online tracker to share and borrow things.
       </div>
       <div style={{ height: 34 }} />
       <button onClick={go} disabled={busy} style={{
