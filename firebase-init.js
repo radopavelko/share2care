@@ -18,12 +18,16 @@ import {
   getStorage, ref as storageRef, uploadBytes, getDownloadURL,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
-// Domains that serve the app AND proxy /__/auth/* to Firebase (see
-// functions/__/auth/[[path]].js). On these, sign-in runs first-party on our
-// own domain, which is what makes it work inside the iOS Home Screen app.
-// Anywhere else (localhost, branch previews) fall back to Firebase's domain.
+// Installed (Home Screen) app? It can't open popups, and iOS blocks the
+// third-party redirect through firebaseapp.com — so there, and only there,
+// sign in first-party on our own domain (proxied by functions/__/auth/).
+// Normal browsers keep Firebase's domain, which works everywhere and doesn't
+// depend on the Google Cloud OAuth client knowing our domain.
+const isStandalone = () =>
+  (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) ||
+  window.navigator.standalone === true;
 const OWN_AUTH_HOSTS = ["sharekeep.online", "www.sharekeep.online", "share2care.pages.dev"];
-const authDomain = OWN_AUTH_HOSTS.includes(window.location.hostname)
+const authDomain = (isStandalone() && OWN_AUTH_HOSTS.includes(window.location.hostname))
   ? window.location.hostname
   : "share2care-7bb3a.firebaseapp.com";
 
@@ -42,11 +46,6 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 const provider = new GoogleAuthProvider();
 provider.setCustomParameters({ prompt: "select_account" });
-
-// Home-screen web apps on iOS can't open popups, so sign in via redirect there.
-const isStandalone = () =>
-  (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) ||
-  window.navigator.standalone === true;
 
 // Popup first (works on desktop and in mobile browsers); if the environment
 // blocks it, fall back to the redirect flow.
