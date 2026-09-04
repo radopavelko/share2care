@@ -11,8 +11,8 @@ import {
   getRedirectResult, signOut, onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
-  getFirestore, collection, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc,
-  onSnapshot, query, orderBy, serverTimestamp, arrayUnion, arrayRemove,
+  getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc,
+  onSnapshot, query, where, orderBy, serverTimestamp, arrayUnion, arrayRemove,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
   getStorage, ref as storageRef, uploadBytes, getDownloadURL,
@@ -171,6 +171,12 @@ window.S2 = {
     return ref.id;
   },
   updateGroup: (groupId, patch) => updateDoc(doc(db, "groups", groupId), patch),
+  // Delete a group; first drop its id from any items that were shared into it.
+  deleteGroup: async (groupId) => {
+    const snap = await getDocs(query(collection(db, "items"), where("groups", "array-contains", groupId)));
+    await Promise.all(snap.docs.map((d) => updateDoc(d.ref, { groups: arrayRemove(groupId) })));
+    await deleteDoc(doc(db, "groups", groupId));
+  },
   // Join by code, using a client-side list of groups (open read in this MVP).
   joinGroupById: (groupId, uid) =>
     updateDoc(doc(db, "groups", groupId), { memberUids: arrayUnion(uid) }),

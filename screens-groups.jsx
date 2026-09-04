@@ -207,8 +207,14 @@ function ManageGroupSheet({ app }) {
   const T = window.THEME;
   const g = app.allGroups.find(x => x.id === app.modalArg);
   const [email, setEmail] = useStateGr('');
+  const [nameDraft, setNameDraft] = useStateGr(null); // null = not editing
   if (!g) return null;
   const isOwner = g.ownerUid === app.uid;
+  const saveName = async () => {
+    if (nameDraft === null) return;
+    if (nameDraft.trim() && nameDraft.trim() !== g.name) { if (await app.renameGroup(g.id, nameDraft)) setNameDraft(null); }
+    else setNameDraft(null);
+  };
   const link = app.inviteLink(g);
   const members = (g.memberUids || []);
   const invited = (g.invitedEmails || []);
@@ -230,7 +236,25 @@ function ManageGroupSheet({ app }) {
   const pickPhoto = (e) => { const f = e.target.files && e.target.files[0]; if (f) app.setGroupPhoto(g.id, f); e.target.value = ''; };
 
   return (
-    <window.Sheet open title={g.name} onClose={app.closeModal}>
+    <window.Sheet open title={isOwner ? undefined : g.name} onClose={app.closeModal}>
+      {isOwner && (
+        nameDraft === null ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+            <div style={{ flex: 1, minWidth: 0, fontFamily: T.font, fontWeight: 700, fontSize: 20, color: T.ink, letterSpacing: -0.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{g.name}</div>
+            <button onClick={() => setNameDraft(g.name)} aria-label="Rename group" style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${T.line}`, background: T.surface, borderRadius: 10,
+              padding: '7px 11px', cursor: 'pointer', fontFamily: T.font, fontSize: 12.5, fontWeight: 600, color: T.inkSoft, WebkitTapHighlightColor: 'transparent',
+            }}><window.Icon name="edit" size={14} /> Rename</button>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+            <input autoFocus value={nameDraft} onChange={e => setNameDraft(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') saveName(); if (e.key === 'Escape') setNameDraft(null); }}
+              style={{ ...window.inputStyle(T), flex: 1, fontWeight: 700, fontSize: 18 }} />
+            <window.Btn variant="dark" onClick={saveName}>Save</window.Btn>
+          </div>
+        )
+      )}
       {/* Group picture: colour, or an uploaded photo (owner only) */}
       {isOwner && (
         <div style={{ marginBottom: 20 }}>
@@ -341,6 +365,13 @@ function ManageGroupSheet({ app }) {
           );
         })}
       </div>
+      {isOwner && (
+        <div style={{ marginTop: 22, textAlign: 'center' }}>
+          <button onClick={() => app.deleteGroup(g.id)} style={{ border: 'none', background: 'none', cursor: 'pointer', fontFamily: T.font, fontSize: 14, fontWeight: 600, color: T.over, padding: 8 }}>
+            Delete group
+          </button>
+        </div>
+      )}
     </window.Sheet>
   );
 }

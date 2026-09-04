@@ -190,6 +190,21 @@ function App({ me }) {
       try { await window.S2.updateGroup(gid, { photoURL: '' }); }
       catch (e) { console.error(e); toast('Could not update group', 'x'); }
     },
+    renameGroup: async (gid, name) => {
+      const nm = (name || '').trim();
+      if (!nm) return false;
+      try { await window.S2.updateGroup(gid, { name: nm }); toast('Group renamed', 'check'); return true; }
+      catch (e) { console.error(e); toast('Could not rename', 'x'); return false; }
+    },
+    deleteGroup: async (gid) => {
+      const g = groups.find(x => x.id === gid);
+      if (!g || g.ownerUid !== uid) return;
+      if (!window.confirm(`Delete “${g.name}”? Members lose access and its things go back to being private. This can’t be undone.`)) return;
+      closeAll();
+      if (groupId === gid) setCurrentGroup(null);
+      try { await window.S2.deleteGroup(gid); toast(`Deleted ${g.name}`, 'trash'); }
+      catch (e) { console.error(e); toast('Could not delete group', 'x'); }
+    },
     setGroupColor: async (gid, color) => {
       try { await window.S2.updateGroup(gid, { color: color || '' }); }
       catch (e) { console.error(e); toast('Could not update group', 'x'); }
