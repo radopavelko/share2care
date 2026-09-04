@@ -18,9 +18,18 @@ import {
   getStorage, ref as storageRef, uploadBytes, getDownloadURL,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
+// Domains that serve the app AND proxy /__/auth/* to Firebase (see
+// functions/__/auth/[[path]].js). On these, sign-in runs first-party on our
+// own domain, which is what makes it work inside the iOS Home Screen app.
+// Anywhere else (localhost, branch previews) fall back to Firebase's domain.
+const OWN_AUTH_HOSTS = ["sharekeep.online", "www.sharekeep.online", "share2care.pages.dev"];
+const authDomain = OWN_AUTH_HOSTS.includes(window.location.hostname)
+  ? window.location.hostname
+  : "share2care-7bb3a.firebaseapp.com";
+
 const firebaseConfig = {
   apiKey: "AIzaSyAJsCrsz6DcgsL1g3443A8S2pWsKGepBHg",
-  authDomain: "share2care-7bb3a.firebaseapp.com",
+  authDomain,
   projectId: "share2care-7bb3a",
   storageBucket: "share2care-7bb3a.firebasestorage.app",
   messagingSenderId: "713799208527",
