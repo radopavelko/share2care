@@ -194,7 +194,7 @@ function App({ me }) {
       const nm = (name || '').trim();
       if (!nm) return false;
       try { await window.S2.updateGroup(gid, { name: nm }); toast('Group renamed', 'check'); return true; }
-      catch (e) { console.error(e); toast('Could not rename', 'x'); return false; }
+      catch (e) { console.error(e); toast(`Could not rename: ${(e && (e.code || e.message)) || 'unknown error'}`, 'x'); return false; }
     },
     deleteGroup: async (gid) => {
       const g = groups.find(x => x.id === gid);
@@ -202,8 +202,10 @@ function App({ me }) {
       if (!window.confirm(`Delete “${g.name}”? Members lose access and its things go back to being private. This can’t be undone.`)) return;
       closeAll();
       if (groupId === gid) setCurrentGroup(null);
-      try { await window.S2.deleteGroup(gid); toast(`Deleted ${g.name}`, 'trash'); }
-      catch (e) { console.error(e); toast('Could not delete group', 'x'); }
+      try {
+        if (typeof window.S2.deleteGroup !== 'function') throw new Error('old app version cached — please reload');
+        await window.S2.deleteGroup(gid); toast(`Deleted ${g.name}`, 'trash');
+      } catch (e) { console.error(e); toast(`Could not delete group: ${(e && (e.code || e.message)) || 'unknown error'}`, 'x'); }
     },
     setGroupColor: async (gid, color) => {
       try { await window.S2.updateGroup(gid, { color: color || '' }); }

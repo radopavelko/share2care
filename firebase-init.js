@@ -171,11 +171,13 @@ window.S2 = {
     return ref.id;
   },
   updateGroup: (groupId, patch) => updateDoc(doc(db, "groups", groupId), patch),
-  // Delete a group; first drop its id from any items that were shared into it.
+  // Delete a group, then (best effort) drop its id from items shared into it.
   deleteGroup: async (groupId) => {
-    const snap = await getDocs(query(collection(db, "items"), where("groups", "array-contains", groupId)));
-    await Promise.all(snap.docs.map((d) => updateDoc(d.ref, { groups: arrayRemove(groupId) })));
     await deleteDoc(doc(db, "groups", groupId));
+    try {
+      const snap = await getDocs(query(collection(db, "items"), where("groups", "array-contains", groupId)));
+      await Promise.all(snap.docs.map((d) => updateDoc(d.ref, { groups: arrayRemove(groupId) }).catch(() => {})));
+    } catch (e) { console.warn("unshare after group delete", e); }
   },
   // Join by code, using a client-side list of groups (open read in this MVP).
   joinGroupById: (groupId, uid) =>
